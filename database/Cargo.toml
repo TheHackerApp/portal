@@ -1,0 +1,10 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono.workspace = true
+eyre.workspace = true
+sqlx = { workspace = true, features = ["chrono", "macros"] }
+tracing.workspace = true

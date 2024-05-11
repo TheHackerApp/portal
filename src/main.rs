@@ -16,6 +16,8 @@ async fn main() -> eyre::Result<()> {
     }
     logging.init()?;
 
+    let _db = database::connect(&config.database_url).await?;
+
     info!("Hello, world!");
 
     Ok(())
@@ -25,6 +27,10 @@ async fn main() -> eyre::Result<()> {
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct Config {
+    /// The database to run migrations on
+    #[arg(long, env = "DATABASE_URL")]
+    database_url: String,
+
     /// The default level to log at
     #[arg(long, default_value_t = Level::INFO, env = "LOG_LEVEL")]
     log_level: Level,
