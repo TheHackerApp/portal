@@ -1097,6 +1097,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
+name = "migrator"
+version = "0.2.1"
+source = "registry+ssh://git@ssh.shipyard.rs/wafflehacks/crate-index.git"
+checksum = "2e03ecd2b3799e6eccc060b34a361d73248f948a3a2517e9bf5e66b1bd32f33a"
+dependencies = [
+ "chrono",
+ "hex",
+ "sqlx",
+ "tracing",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2957,6 +2969,22 @@ checksum = "524e57b2c537c0f9b1e69f1965311ec12182b4122e45035b1508cd24d2adadb1"
 dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "xtask"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "color-eyre",
+ "database",
+ "dotenvy",
+ "eyre",
+ "logging",
+ "migrator",
+ "sqlx",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
