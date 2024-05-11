@@ -1,0 +1,26 @@
+---
+services:
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: portal
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: super-secure-password
+    networks:
+      - default
+    ports:
+      - "7832:5432"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    networks:
+      - default
+    ports:
+      - "7853:16686"
+      - "7817:4317"
+      - "7818:4318"
+
+networks:
+  default:
