@@ -1,11 +1,14 @@
 use eyre::WrapErr;
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
     color_eyre::install()?;
     dotenv()?;
 
-    println!("Hello, world!");
+    logging::config().init()?;
+
+    info!("Hello, world!");
 
     Ok(())
 }

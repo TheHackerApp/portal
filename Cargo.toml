@@ -7,7 +7,9 @@ edition = "2021"
 color-eyre.workspace = true
 dotenvy.workspace = true
 eyre.workspace = true
+logging.workspace = true
 tokio = { workspace = true, features = ["macros", "net", "signal"] }
+tracing.workspace = true
 
 [profile.release]
 panic = "abort"
@@ -16,4 +18,6 @@ panic = "abort"
 color-eyre = "0.6"
 dotenvy = "0.15"
 eyre = "0.6"
+logging = { version = "0.3", registry = "wafflehacks" }
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+tracing = { version = "0.1", features = ["log"] }
