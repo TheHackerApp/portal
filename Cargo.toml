@@ -9,6 +9,9 @@ dotenvy.workspace = true
 eyre.workspace = true
 tokio = { workspace = true, features = ["macros", "net", "signal"] }
 
+[profile.release]
+panic = "abort"
+
 [workspace.dependencies]
 color-eyre = "0.6"
 dotenvy = "0.15"
