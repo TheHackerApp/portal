@@ -3,13 +3,20 @@ use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
     ConnectOptions,
 };
-use std::{str::FromStr, time::Duration};
+use std::{
+    fmt::{Debug, Display, Formatter},
+    str::FromStr,
+    sync::Arc,
+    time::Duration,
+};
 use tracing::{info, instrument, log::LevelFilter};
 
 mod application;
 
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity};
 pub use sqlx::{Error as SqlxError, PgPool};
+
+pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// Connect to the database and ensure it works
 #[instrument(skip_all)]
@@ -27,4 +34,42 @@ pub async fn connect(url: &str) -> eyre::Result<PgPool> {
 
     info!("database connected");
     Ok(db)
+}
+
+/// Represents the different way the database can fail
+#[derive(Clone)]
+pub struct Error(Arc<SqlxError>);
+
+impl Error {
+    /// Returns whether the error kind is a violation of a unique/primary key constraint.
+    pub fn is_unique_violation(&self) -> bool {
+        match self.0.as_ref() {
+            SqlxError::Database(e) => e.is_unique_violation(),
+            _ => false,
+        }
+    }
+}
+
+impl Debug for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.0.source()
+    }
+}
+
+impl From<SqlxError> for Error {
+    fn from(error: SqlxError) -> Self {
+        Self(Arc::new(error))
+    }
 }
