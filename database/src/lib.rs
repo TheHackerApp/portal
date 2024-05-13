@@ -3,13 +3,13 @@ use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
     ConnectOptions,
 };
-use std::{
-    str::FromStr,
-    time::Duration,
-};
+use std::{str::FromStr, time::Duration};
 use tracing::{info, instrument, log::LevelFilter};
 
-pub use sqlx::{PgPool, Error as SqlxError};
+mod application;
+
+pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity};
+pub use sqlx::{Error as SqlxError, PgPool};
 
 /// Connect to the database and ensure it works
 #[instrument(skip_all)]

@@ -8,3 +8,4 @@ chrono.workspace = true
 eyre.workspace = true
 sqlx = { workspace = true, features = ["chrono", "macros"] }
 tracing.workspace = true
+clap = { version = "4.5.4", features = ["derive"] }
