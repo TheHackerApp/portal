@@ -75,3 +75,17 @@ impl From<SqlxError> for Error {
         Self(Arc::new(error))
     }
 }
+
+#[cfg(feature = "graphql")]
+impl async_graphql::ErrorExtensions for Error {
+    fn extend(&self) -> async_graphql::Error {
+        use std::error::Error as _;
+
+        match self.source() {
+            Some(e) => tracing::error!(error = %self.0, source = %e, "unexpected database error"),
+            None => tracing::error!(error = %self.0, "unexpected database error"),
+        }
+
+        async_graphql::Error::new("internal server error")
+    }
+}
