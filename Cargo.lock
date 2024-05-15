@@ -140,9 +140,12 @@ dependencies = [
  "bytes",
  "chrono",
  "fnv",
+ "futures-channel",
+ "futures-timer",
  "futures-util",
  "http 1.1.0",
  "indexmap 2.2.6",
+ "lru",
  "mime",
  "multer",
  "num-traits",
@@ -555,6 +558,7 @@ version = "0.5.2"
 source = "registry+ssh://git@ssh.shipyard.rs/wafflehacks/crate-index.git"
 checksum = "92327c986121de3923e8c4d54a8bd5c2a1ccc2a33926796839c6e79762a51b78"
 dependencies = [
+ "async-graphql",
  "async-trait",
  "axum-core 0.4.3",
  "headers",
@@ -681,10 +685,12 @@ checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
 name = "database"
 version = "0.1.0"
 dependencies = [
+ "async-graphql",
  "chrono",
- "clap",
+ "context",
  "eyre",
  "sqlx",
+ "tokio",
  "tracing",
 ]
 
@@ -882,6 +888,12 @@ name = "futures-task"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38d84fa142264698cdce1a9f9172cf383a0c82de1bddcf3092901442c4097004"
+
+[[package]]
+name = "futures-timer"
+version = "3.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f288b0a4f20f9a56b5d1da57e2227c661b7b16168e2f72365f57b63326e29b24"
 
 [[package]]
 name = "futures-util"
@@ -1414,6 +1426,15 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "uuid",
+]
+
+[[package]]
+name = "lru"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3262e75e648fce39813cb56ac41f3c3e3f65217ebf3844d818d1f9398cfb0dc"
+dependencies = [
+ "hashbrown 0.14.5",
 ]
 
 [[package]]

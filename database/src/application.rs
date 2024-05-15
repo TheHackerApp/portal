@@ -1,10 +1,13 @@
-use super::Result;
+use crate::Result;
+#[cfg(feature = "graphql")]
+use async_graphql::{ComplexObject, Enum, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Executor, QueryBuilder};
 use tracing::instrument;
 
 /// A person's gender
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
+#[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "gender")]
 pub enum Gender {
     Male,
@@ -15,6 +18,7 @@ pub enum Gender {
 
 /// A person's race/ethnicity
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
+#[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "race_ethnicity")]
 pub enum RaceEthnicity {
     AsianIndian,
@@ -38,6 +42,7 @@ pub enum RaceEthnicity {
 
 /// A person's level of education
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
+#[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "education")]
 pub enum Education {
     BelowSecondary,
@@ -53,6 +58,7 @@ pub enum Education {
 
 /// The status of an application
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
+#[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "lowercase", type_name = "application_status")]
 pub enum ApplicationStatus {
     Pending,
@@ -63,10 +69,13 @@ pub enum ApplicationStatus {
 
 /// An application to an event
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "graphql", derive(SimpleObject))]
 pub struct Application {
     /// The slug of the event the application is for
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub event: String,
     /// The ID of the participant that submitted the application
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub participant_id: i32,
 
     /// The participant's gender
@@ -89,23 +98,31 @@ pub struct Application {
     pub links: Vec<String>,
 
     /// The first line of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub address_line1: String,
     /// The second line of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub address_line2: Option<String>,
     /// The last line of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub address_line3: Option<String>,
     /// The city/town of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub locality: Option<String>,
     /// The state/province/region of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub administrative_area: Option<String>,
     /// The postal code of the shipping address
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub postal_code: String,
     /// The ISO code of the country the shipping address is located in
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub country: String,
 
     /// Whether the participant wishes to share information with sponsors
     pub share_information: bool,
 
+    // TODO: restrict these fields to organizers
     /// The application's acceptance status
     pub status: ApplicationStatus,
     /// Whether the application needs extra review
@@ -117,6 +134,23 @@ pub struct Application {
     pub created_at: DateTime<Utc>,
     /// When the application was last modified
     pub updated_at: DateTime<Utc>,
+}
+
+#[cfg(feature = "graphql")]
+#[ComplexObject]
+impl Application {
+    /// The applicant's shipping address
+    async fn address(&self) -> Address<'_> {
+        Address {
+            line1: &self.address_line1,
+            line2: self.address_line2.as_deref(),
+            line3: self.address_line3.as_deref(),
+            locality: self.locality.as_deref(),
+            administrative_area: self.locality.as_deref(),
+            postal_code: &self.postal_code,
+            country: &self.country,
+        }
+    }
 }
 
 impl Application {
@@ -238,6 +272,19 @@ impl Application {
 
         Ok(())
     }
+}
+
+/// A person's shipping address
+#[cfg(feature = "graphql")]
+#[derive(Clone, Debug, Eq, PartialEq, SimpleObject)]
+pub struct Address<'a> {
+    line1: &'a str,
+    line2: Option<&'a str>,
+    line3: Option<&'a str>,
+    locality: Option<&'a str>,
+    administrative_area: Option<&'a str>,
+    postal_code: &'a str,
+    country: &'a str,
 }
 
 /// Handles updating an application

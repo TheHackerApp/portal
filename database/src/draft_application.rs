@@ -1,4 +1,6 @@
 use crate::{Education, Gender, RaceEthnicity, Result};
+#[cfg(feature = "graphql")]
+use async_graphql::SimpleObject;
 use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Executor};
 use std::fmt::Debug;
@@ -6,10 +8,13 @@ use tracing::instrument;
 
 /// An in-progress application from a participant
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "graphql", derive(SimpleObject))]
 pub struct DraftApplication {
     /// The slug of the event the application is for
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub event: String,
     /// The ID of the participant that submitted the application
+    #[cfg_attr(feature = "graphql", graphql(skip))]
     pub participant_id: i32,
 
     /// The participant's gender

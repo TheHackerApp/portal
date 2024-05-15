@@ -4,8 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-graphql = { workspace = true, features = ["dataloader"], optional = true }
 chrono.workspace = true
+context = { workspace = true, features = ["graphql"], optional = true }
 eyre.workspace = true
 sqlx = { workspace = true, features = ["chrono", "macros"] }
 tracing.workspace = true
-clap = { version = "4.5.4", features = ["derive"] }
+tokio = { workspace = true, optional = true }
+
+[features]
+default = []
+graphql = ["async-graphql", "context", "tokio"]
