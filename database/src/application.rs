@@ -174,6 +174,48 @@ impl Application {
         Ok(application)
     }
 
+    /// Create a new application from a draft
+    #[instrument(name = "Application::from_draft", skip(db))]
+    pub async fn from_draft<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<Self>
+    where
+        'c: 'e,
+        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+    {
+        let application = query_as!(
+            Application,
+            r#"
+            INSERT INTO applications (
+                event, participant_id,
+                gender, race_ethnicity, date_of_birth,
+                education, graduation_year, major,
+                hackathons_attended, links,
+                address_line1, address_line2, address_line3, locality, administrative_area,
+                postal_code, country,
+                share_information,
+                created_at, updated_at
+            )
+            SELECT * FROM draft_applications
+            WHERE participant_id = $1 AND event = $2
+            RETURNING
+                event, participant_id,
+                gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
+                date_of_birth,
+                education as "education: Education", graduation_year, major,
+                hackathons_attended, links,
+                address_line1, address_line2, address_line3, locality, administrative_area,
+                postal_code, country, share_information,
+                status as "status: ApplicationStatus", flagged, notes,
+                created_at, updated_at
+            "#,
+            participant_id,
+            event,
+        )
+        .fetch_one(db)
+        .await?;
+
+        Ok(application)
+    }
+
     /// Update the application's fields
     pub fn update(&mut self) -> ApplicationUpdater<'_> {
         ApplicationUpdater::new(self)
