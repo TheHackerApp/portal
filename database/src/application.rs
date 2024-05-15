@@ -70,6 +70,7 @@ pub enum ApplicationStatus {
 /// An application to an event
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "graphql", derive(SimpleObject))]
+#[cfg_attr(feature = "graphql", graphql(complex))]
 pub struct Application {
     /// The slug of the event the application is for
     #[cfg_attr(feature = "graphql", graphql(skip))]
