@@ -1,9 +1,9 @@
-use super::results;
+use super::{results, UserError};
 use crate::errors::Forbidden;
 use async_graphql::{Context, InputObject, Object, Result, ResultExt};
 use chrono::NaiveDate;
 use context::{checks, UserRole};
-use database::{DraftApplication, Education, Gender, PgPool, RaceEthnicity};
+use database::{Application, DraftApplication, Education, Gender, PgPool, RaceEthnicity};
 use tracing::instrument;
 
 results! {
@@ -33,6 +33,16 @@ impl Mutation {
         }
 
         let db = ctx.data_unchecked::<PgPool>();
+
+        if Application::exists(&scope.event, user.id, db)
+            .await
+            .extend()?
+        {
+            return Ok(
+                UserError::new(&["saveApplication"], "application already submitted").into(),
+            );
+        }
+
         let mut draft = DraftApplication::find(&scope.event, user.id, db)
             .await
             .extend()?

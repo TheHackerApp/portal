@@ -1,5 +1,6 @@
 use async_graphql::{MergedObject, Object};
 
+mod application;
 mod draft_application;
 
 /// The various GraphQL mutations
@@ -7,7 +8,7 @@ mod draft_application;
 /// To improve readability, the mutation implementations are split into different files, but all
 /// attached to this one struct.
 #[derive(Default, MergedObject)]
-pub struct Mutation(draft_application::Mutation);
+pub struct Mutation(application::Mutation, draft_application::Mutation);
 
 /// Represents and error in the input of a mutation
 #[derive(Debug)]

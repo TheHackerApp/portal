@@ -5,6 +5,7 @@ use sqlx::{
 };
 use std::{
     fmt::{Debug, Display, Formatter},
+    ops::Deref,
     str::FromStr,
     sync::Arc,
     time::Duration,
@@ -67,6 +68,20 @@ impl Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         self.0.source()
+    }
+}
+
+impl Deref for Error {
+    type Target = SqlxError;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl AsRef<SqlxError> for Error {
+    fn as_ref(&self) -> &SqlxError {
+        &self.0
     }
 }
 
