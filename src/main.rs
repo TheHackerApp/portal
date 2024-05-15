@@ -1,6 +1,8 @@
 use clap::Parser;
 use eyre::{eyre, WrapErr};
 use logging::OpenTelemetryProtocol;
+use std::net::SocketAddr;
+use tokio::{net::TcpListener, signal};
 use tracing::{info, Level};
 
 #[tokio::main]
@@ -16,17 +18,54 @@ async fn main() -> eyre::Result<()> {
     }
     logging.init()?;
 
-    let _db = database::connect(&config.database_url).await?;
+    let db = database::connect(&config.database_url).await?;
 
-    info!("Hello, world!");
+    let router = portal::router(db);
+
+    let listener = TcpListener::bind(&config.address)
+        .await
+        .wrap_err("failed to bind listener")?;
+    info!(address = %config.address, "listening and ready to handle requests");
+
+    axum::serve(listener, router)
+        .with_graceful_shutdown(shutdown())
+        .await
+        .wrap_err("failed to start server")?;
 
     Ok(())
+}
+
+/// Setup hyper graceful shutdown for SIGINT (ctrl+c) and SIGTERM
+async fn shutdown() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install ctrl+c handler")
+    };
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install sigterm handler")
+            .recv()
+            .await
+    };
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    info!("server successfully shutdown");
+    info!("goodbye! o/");
 }
 
 /// The participant application, attendance, and communication platform.
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct Config {
+    /// The address for the server to listen on
+    #[arg(long, default_value = "127.0.0.1:7878", env = "ADDRESS")]
+    address: SocketAddr,
+
     /// The database to run migrations on
     #[arg(long, env = "DATABASE_URL")]
     database_url: String,

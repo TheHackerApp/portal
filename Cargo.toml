@@ -4,12 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-graphql = { workspace = true, features = ["playground"] }
+async-graphql-axum = "7.0"
+axum = { version = "0.7", default-features = false, features = ["http1", "http2", "json", "query", "tokio"] }
 clap.workspace = true
 color-eyre.workspace = true
+context = { workspace = true, features = ["axum"] }
 database.workspace = true
 dotenvy.workspace = true
 eyre.workspace = true
-logging = { workspace = true, features = ["opentelemetry"] }
+graphql.workspace = true
+logging = { workspace = true, features = ["http", "opentelemetry"] }
 tokio = { workspace = true, features = ["macros", "net", "signal"] }
 tracing.workspace = true
 
@@ -20,9 +25,11 @@ panic = "abort"
 members = ["database", "graphql", "xtask"]
 
 [workspace.dependencies]
+async-graphql = { version = "7.0", features = ["chrono"], default-features = false }
 clap = { version = "4.4", features = ["derive", "env"] }
 chrono = "0.4"
 color-eyre = "0.6"
+context = { version = "0.5", registry = "wafflehacks" }
 dotenvy = "0.15"
 eyre = "0.6"
 logging = { version = "0.3", registry = "wafflehacks" }
