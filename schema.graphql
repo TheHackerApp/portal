@@ -1,9 +1,232 @@
+"""
+An application to an event
+"""
+type Application {
+	"""
+	The participant's gender
+	"""
+	gender: Gender!
+	"""
+	The participant's race/ethnicity
+	"""
+	raceEthnicity: RaceEthnicity!
+	"""
+	Participant birthday
+	"""
+	dateOfBirth: NaiveDate!
+	"""
+	The highest level of education the participant has achieved/is working on
+	"""
+	education: Education!
+	"""
+	When the participant will graduate/graduated
+	"""
+	graduationYear: Int!
+	"""
+	What the participant is studying
+	"""
+	major: String
+	"""
+	How many hackathons the participant has attended
+	"""
+	hackathonsAttended: Int!
+	"""
+	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	"""
+	links: [String!]!
+	"""
+	Whether the participant wishes to share information with sponsors
+	"""
+	shareInformation: Boolean!
+	"""
+	The application's acceptance status
+	"""
+	status: ApplicationStatus!
+	"""
+	Whether the application needs extra review
+	"""
+	flagged: Boolean!
+	"""
+	Additional organizer-only notes
+	"""
+	notes: String!
+	"""
+	When the application was submitted
+	"""
+	createdAt: DateTime!
+	"""
+	When the application was last modified
+	"""
+	updatedAt: DateTime!
+}
+
+"""
+The status of an application
+"""
+enum ApplicationStatus {
+	PENDING
+	WAITLISTED
+	REJECTED
+	ACCEPTED
+}
+
+
+"""
+Implement the DateTime<Utc> scalar
+
+The input/output is a string in RFC3339 format.
+"""
+scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339")
+
+"""
+An in-progress application from a participant
+"""
+type DraftApplication {
+	"""
+	The participant's gender
+	"""
+	gender: Gender
+	"""
+	The participant's race/ethnicity
+	"""
+	raceEthnicity: RaceEthnicity
+	"""
+	Participant birthday
+	"""
+	dateOfBirth: NaiveDate
+	"""
+	The highest level of education the participant has achieved/is working on
+	"""
+	education: Education
+	"""
+	When the participant will graduate/graduated
+	"""
+	graduationYear: Int
+	"""
+	What the participant is studying
+	"""
+	major: String
+	"""
+	How many hackathons the participant has attended
+	"""
+	hackathonsAttended: Int
+	"""
+	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	"""
+	links: [String!]
+	"""
+	The first line of the shipping address
+	"""
+	addressLine1: String
+	"""
+	The second line of the shipping address
+	"""
+	addressLine2: String
+	"""
+	The last line of the shipping address
+	"""
+	addressLine3: String
+	"""
+	The city/town of the shipping address
+	"""
+	locality: String
+	"""
+	The state/province/region of the shipping address
+	"""
+	administrativeArea: String
+	"""
+	The postal code of the shipping address
+	"""
+	postalCode: String
+	"""
+	The ISO code of the country the shipping address is located in
+	"""
+	country: String
+	"""
+	Whether the participant wishes to share information with sponsors
+	"""
+	shareInformation: Boolean
+	"""
+	When the application was submitted
+	"""
+	createdAt: DateTime!
+	"""
+	When the application was last modified
+	"""
+	updatedAt: DateTime!
+}
+
+"""
+A person's level of education
+"""
+enum Education {
+	BELOW_SECONDARY
+	SECONDARY
+	UNDERGRADUATE_TWO_YEAR
+	UNDERGRADUATE_THREE_YEAR_PLUS
+	GRADUATE
+	BOOTCAMP
+	VOCATIONAL
+	OTHER
+	NON_STUDENT
+}
+
+
+"""
+A person's gender
+"""
+enum Gender {
+	MALE
+	FEMALE
+	NON_BINARY
+	OTHER
+}
 
 
 
+"""
+ISO 8601 calendar date without timezone.
+Format: %Y-%m-%d
+
+# Examples
+
+* `1994-11-13`
+* `2000-02-24`
+"""
+scalar NaiveDate
 
 type Query {
-	test: String!
+	"""
+	Get a submitted application
+	"""
+	application(userId: Int): Application
+	"""
+	Get an in-progress application
+	"""
+	draftApplication(userId: Int): DraftApplication
+}
+
+"""
+A person's race/ethnicity
+"""
+enum RaceEthnicity {
+	ASIAN_INDIAN
+	BLACK
+	CHINESE
+	FILIPINO
+	GUAMANIAN
+	HISPANIC
+	JAPANESE
+	KOREAN
+	MIDDLE_EASTERN
+	NATIVE_AMERICAN
+	NATIVE_HAWAIIAN
+	SAMOAN
+	VIETNAMESE
+	WHITE
+	OTHER_ASIAN
+	OTHER_PACIFIC_ISLANDER
+	OTHER
 }
 
 

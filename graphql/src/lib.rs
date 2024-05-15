@@ -4,6 +4,7 @@ use async_graphql::{
 };
 use database::PgPool;
 
+mod errors;
 mod query;
 
 use query::Query;

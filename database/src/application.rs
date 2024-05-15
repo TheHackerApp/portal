@@ -172,6 +172,37 @@ impl Application {
         Ok(result.exists.unwrap_or_default())
     }
 
+    /// Get all the submitted applications for an event
+    #[instrument(name = "Application::all", skip(db))]
+    pub async fn all<'c, 'e, E>(event: &str, db: E) -> Result<Vec<Application>>
+    where
+        'c: 'e,
+        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+    {
+        let applications = query_as!(
+            Application,
+            r#"
+            SELECT
+                event, participant_id,
+                gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
+                date_of_birth,
+                education as "education: Education", graduation_year, major,
+                hackathons_attended, links,
+                address_line1, address_line2, address_line3, locality, administrative_area,
+                postal_code, country, share_information,
+                status as "status: ApplicationStatus", flagged, notes,
+                created_at, updated_at
+            FROM applications
+            WHERE event = $1
+            "#,
+            event
+        )
+        .fetch_all(db)
+        .await?;
+
+        Ok(applications)
+    }
+
     /// Get an application by its event and participant id
     #[instrument(name = "Application::find", skip(db))]
     pub async fn find<'c, 'e, E>(
