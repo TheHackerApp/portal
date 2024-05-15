@@ -3519,6 +3519,7 @@ dependencies = [
  "database",
  "dotenvy",
  "eyre",
+ "graphql",
  "logging",
  "migrator",
  "sqlx",
