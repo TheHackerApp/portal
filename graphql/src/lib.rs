@@ -1,6 +1,5 @@
 use async_graphql::{
-    extensions::Analyzer, EmptyMutation, EmptySubscription, SDLExportOptions, Schema as BaseSchema,
-    SchemaBuilder,
+    extensions::Analyzer, EmptySubscription, SDLExportOptions, Schema as BaseSchema, SchemaBuilder,
 };
 use database::PgPool;
 
@@ -8,14 +7,15 @@ mod errors;
 mod mutation;
 mod query;
 
+use mutation::Mutation;
 use query::Query;
 
 /// The graphql schema for the service
-pub type Schema = BaseSchema<Query, EmptyMutation, EmptySubscription>;
+pub type Schema = BaseSchema<Query, Mutation, EmptySubscription>;
 
 /// Create a schema builder with the necessary extensions
-fn builder() -> SchemaBuilder<Query, EmptyMutation, EmptySubscription> {
-    Schema::build(Query, EmptyMutation, EmptySubscription)
+fn builder() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
+    Schema::build(Query, Mutation::default(), EmptySubscription)
         .enable_federation()
         .extension(logging::GraphQL)
         .extension(Analyzer)
