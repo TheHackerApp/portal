@@ -12,8 +12,10 @@ use std::{
 use tracing::{info, instrument, log::LevelFilter};
 
 mod application;
+mod draft_application;
 
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity};
+pub use draft_application::DraftApplication;
 pub use sqlx::{Error as SqlxError, PgPool};
 
 pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
