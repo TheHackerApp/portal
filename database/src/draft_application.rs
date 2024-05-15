@@ -2,7 +2,7 @@ use crate::{Education, Gender, RaceEthnicity, Result};
 #[cfg(feature = "graphql")]
 use async_graphql::SimpleObject;
 use chrono::{DateTime, NaiveDate, Utc};
-use sqlx::{query, query_as, Executor};
+use sqlx::{query, query_as, Acquire};
 use std::fmt::Debug;
 use tracing::instrument;
 
@@ -89,33 +89,33 @@ impl DraftApplication {
 
     /// Check if a draft application exists
     #[instrument(name = "Application::exists", skip(db))]
-    pub async fn exists<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<bool>
+    pub async fn exists<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<bool>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let result = query!(
             "SELECT exists(SELECT 1 FROM draft_applications WHERE participant_id = $1 AND event = $2)",
             participant_id,
             event
         )
-        .fetch_one(db)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(result.exists.unwrap_or_default())
     }
 
     /// Get a draft application by the event and participant ID
-    #[instrument(name = "DraftApplication::find")]
-    pub async fn find<'c, 'e, E>(
+    #[instrument(name = "DraftApplication::find", skip(db))]
+    pub async fn find<'a, 'c, A>(
         event: &str,
         participant_id: i32,
-        db: E,
+        db: A,
     ) -> Result<Option<DraftApplication>>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let draft = query_as!(
             DraftApplication,
             r#"
@@ -134,7 +134,7 @@ impl DraftApplication {
             participant_id,
             event
         )
-        .fetch_optional(db)
+        .fetch_optional(&mut *conn)
         .await?;
 
         Ok(draft)
@@ -146,11 +146,11 @@ impl DraftApplication {
         skip_all,
         fields(event = self.event, participant_id = self.participant_id)
     )]
-    pub async fn save<'c, 'e, E>(&self, db: E) -> Result<()>
+    pub async fn save<'a, 'c, A>(&self, db: A) -> Result<()>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         query!(
             r#"
             INSERT INTO draft_applications (
@@ -205,7 +205,7 @@ impl DraftApplication {
             self.country,
             self.share_information,
         )
-        .execute(db)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())
@@ -213,17 +213,17 @@ impl DraftApplication {
 
     /// Delete a draft application
     #[instrument(name = "DraftApplication::delete", skip(db))]
-    pub async fn delete<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<()>
+    pub async fn delete<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<()>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         query!(
             "DELETE FROM draft_applications WHERE participant_id = $1 AND event = $2",
             participant_id,
             event
         )
-        .execute(db)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())

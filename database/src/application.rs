@@ -2,7 +2,7 @@ use crate::Result;
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, Enum, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
-use sqlx::{query, query_as, Executor, QueryBuilder};
+use sqlx::{query, query_as, Acquire, QueryBuilder};
 use tracing::instrument;
 
 /// A person's gender
@@ -157,17 +157,17 @@ impl Application {
 impl Application {
     /// Check if an application exists
     #[instrument(name = "Application::exists", skip(db))]
-    pub async fn exists<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<bool>
+    pub async fn exists<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<bool>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let result = query!(
             "SELECT exists(SELECT 1 FROM applications WHERE participant_id = $1 AND event = $2)",
             participant_id,
             event
         )
-        .fetch_one(db)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(result.exists.unwrap_or_default())
@@ -175,11 +175,11 @@ impl Application {
 
     /// Get all the submitted applications for an event
     #[instrument(name = "Application::all", skip(db))]
-    pub async fn all<'c, 'e, E>(event: &str, db: E) -> Result<Vec<Application>>
+    pub async fn all<'a, 'c, A>(event: &str, db: A) -> Result<Vec<Application>>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let applications = query_as!(
             Application,
             r#"
@@ -198,7 +198,7 @@ impl Application {
             "#,
             event
         )
-        .fetch_all(db)
+        .fetch_all(&mut *conn)
         .await?;
 
         Ok(applications)
@@ -206,15 +206,15 @@ impl Application {
 
     /// Get an application by its event and participant id
     #[instrument(name = "Application::find", skip(db))]
-    pub async fn find<'c, 'e, E>(
+    pub async fn find<'a, 'c, A>(
         event: &str,
         participant_id: i32,
-        db: E,
+        db: A,
     ) -> Result<Option<Application>>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let application = query_as!(
             Application,
             r#"
@@ -234,7 +234,7 @@ impl Application {
             participant_id,
             event
         )
-        .fetch_optional(db)
+        .fetch_optional(&mut *conn)
         .await?;
 
         Ok(application)
@@ -242,11 +242,11 @@ impl Application {
 
     /// Create a new application from a draft
     #[instrument(name = "Application::from_draft", skip(db))]
-    pub async fn from_draft<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<Self>
+    pub async fn from_draft<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<Self>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         let application = query_as!(
             Application,
             r#"
@@ -276,7 +276,7 @@ impl Application {
             participant_id,
             event,
         )
-        .fetch_one(db)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(application)
@@ -289,17 +289,17 @@ impl Application {
 
     /// Delete an application
     #[instrument(name = "Application::delete", skip(db))]
-    pub async fn delete<'c, 'e, E>(event: &str, participant_id: i32, db: E) -> Result<()>
+    pub async fn delete<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<()>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
+        let mut conn = db.acquire().await?;
         query!(
             "DELETE FROM applications WHERE participant_id = $1 AND event = $2",
             participant_id,
             event
         )
-        .execute(db)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())
@@ -327,8 +327,8 @@ pub struct ApplicationUpdater<'a> {
     notes: Option<String>,
 }
 
-impl<'a> ApplicationUpdater<'a> {
-    fn new(application: &'a mut Application) -> ApplicationUpdater<'a> {
+impl<'m> ApplicationUpdater<'m> {
+    fn new(application: &'m mut Application) -> ApplicationUpdater<'m> {
         Self {
             application,
             status: None,
@@ -382,10 +382,9 @@ impl<'a> ApplicationUpdater<'a> {
             self.event = self.application.event
         )
     )]
-    pub async fn save<'c, 'e, E>(self, db: E) -> Result<()>
+    pub async fn save<'a, 'c, A>(self, db: A) -> Result<()>
     where
-        'c: 'e,
-        E: 'e + Executor<'c, Database = sqlx::Postgres>,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
     {
         if self.status.is_none() && self.flagged.is_none() && self.notes.is_none() {
             // nothing was changed
@@ -415,7 +414,8 @@ impl<'a> ApplicationUpdater<'a> {
         builder.push(" AND event = ");
         builder.push_bind(&self.application.event);
 
-        builder.build().execute(db).await?;
+        let mut conn = db.acquire().await?;
+        builder.build().execute(&mut *conn).await?;
 
         if let Some(status) = self.status {
             self.application.status = status;
