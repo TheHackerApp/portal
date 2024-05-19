@@ -1,15 +1,17 @@
+#[cfg(feature = "graphql")]
+use crate::stubs::{Event, Participant};
 use crate::{Education, Gender, RaceEthnicity, Result};
 #[cfg(feature = "graphql")]
-use async_graphql::SimpleObject;
+use async_graphql::{ComplexObject, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Acquire};
-use std::fmt::Debug;
-use std::future::Future;
+use std::{fmt::Debug, future::Future};
 use tracing::instrument;
 
 /// An in-progress application from a participant
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "graphql", derive(SimpleObject))]
+#[cfg_attr(feature = "graphql", graphql(complex))]
 pub struct DraftApplication {
     /// The slug of the event the application is for
     #[cfg_attr(feature = "graphql", graphql(skip))]
@@ -59,6 +61,21 @@ pub struct DraftApplication {
     pub created_at: DateTime<Utc>,
     /// When the application was last modified
     pub updated_at: DateTime<Utc>,
+}
+
+#[ComplexObject]
+impl DraftApplication {
+    /// The event the application is for
+    async fn event(&self) -> Event<'_> {
+        Event { slug: &self.event }
+    }
+
+    /// The participant who submitted the application
+    async fn participant(&self) -> Participant {
+        Participant {
+            id: self.participant_id,
+        }
+    }
 }
 
 impl DraftApplication {

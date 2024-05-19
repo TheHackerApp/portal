@@ -16,6 +16,8 @@ use tracing::{info, instrument, log::LevelFilter};
 mod macros;
 mod application;
 mod draft_application;
+#[cfg(feature = "graphql")]
+mod stubs;
 
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity};
 pub use draft_application::DraftApplication;

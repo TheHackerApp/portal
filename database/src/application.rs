@@ -1,3 +1,5 @@
+#[cfg(feature = "graphql")]
+use crate::stubs::{Event, Participant};
 use crate::Result;
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, Enum, SimpleObject};
@@ -141,6 +143,18 @@ pub struct Application {
 #[cfg(feature = "graphql")]
 #[ComplexObject]
 impl Application {
+    /// The event the application is for
+    async fn event(&self) -> Event<'_> {
+        Event { slug: &self.event }
+    }
+
+    /// The participant who submitted the application
+    async fn participant(&self) -> Participant {
+        Participant {
+            id: self.participant_id,
+        }
+    }
+
     /// The applicant's shipping address
     async fn address(&self) -> Address<'_> {
         Address {

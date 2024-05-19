@@ -72,6 +72,14 @@ type Application {
 	"""
 	updatedAt: DateTime!
 	"""
+	The event the application is for
+	"""
+	event: Event!
+	"""
+	The participant who submitted the application
+	"""
+	participant: Participant!
+	"""
 	The applicant's shipping address
 	"""
 	address: Address!
@@ -171,6 +179,14 @@ type DraftApplication {
 	When the application was last modified
 	"""
 	updatedAt: DateTime!
+	"""
+	The event the application is for
+	"""
+	event: Event!
+	"""
+	The participant who submitted the application
+	"""
+	participant: Participant!
 }
 
 """
@@ -186,6 +202,13 @@ enum Education {
 	VOCATIONAL
 	OTHER
 	NON_STUDENT
+}
+
+"""
+Stub for an event in the identity service
+"""
+type Event @key(fields: "slug", resolvable: false) {
+	slug: String!
 }
 
 
@@ -228,6 +251,13 @@ Format: %Y-%m-%d
 * `2000-02-24`
 """
 scalar NaiveDate
+
+"""
+Stub for a participant in the identity service
+"""
+type Participant @key(fields: "id", resolvable: false) {
+	id: Int!
+}
 
 type Query {
 	"""
