@@ -1,4 +1,17 @@
 """
+A person's shipping address
+"""
+type Address {
+	line1: String!
+	line2: String
+	line3: String
+	locality: String
+	administrativeArea: String
+	postalCode: String!
+	country: String!
+}
+
+"""
 An application to an event
 """
 type Application {
@@ -58,6 +71,10 @@ type Application {
 	When the application was last modified
 	"""
 	updatedAt: DateTime!
+	"""
+	The applicant's shipping address
+	"""
+	address: Address!
 }
 
 """
@@ -185,6 +202,23 @@ enum Gender {
 
 
 """
+The various GraphQL mutations
+
+To improve readability, the mutation implementations are split into different files, but all
+attached to this one struct.
+"""
+type Mutation {
+	"""
+	Submit a draft application
+	"""
+	submitApplication: SubmitApplicationResult!
+	"""
+	Save updates to an in-progress application
+	"""
+	saveApplication(input: SaveApplicationInput!): SaveApplicationResult!
+}
+
+"""
 ISO 8601 calendar date without timezone.
 Format: %Y-%m-%d
 
@@ -199,11 +233,15 @@ type Query {
 	"""
 	Get a submitted application
 	"""
-	application(userId: Int): Application
+	application(id: Int): Application
+	"""
+	Get all submitted applications
+	"""
+	applications: [Application!]!
 	"""
 	Get an in-progress application
 	"""
-	draftApplication(userId: Int): DraftApplication
+	draftApplication(id: Int): DraftApplication
 }
 
 """
@@ -229,6 +267,112 @@ enum RaceEthnicity {
 	OTHER
 }
 
+"""
+Input fields for saving an in-progress application
+"""
+input SaveApplicationInput {
+	"""
+	The participant's gender
+	"""
+	gender: Gender
+	"""
+	The participant's race/ethnicity
+	"""
+	raceEthnicity: RaceEthnicity
+	"""
+	Participant birthday
+	"""
+	dateOfBirth: NaiveDate
+	"""
+	The highest level of education the participant has achieved/is working on
+	"""
+	education: Education
+	"""
+	When the participant will graduate/graduated
+	"""
+	graduationYear: Int
+	"""
+	What the participant is studying
+	"""
+	major: String
+	"""
+	How many hackathons the participant has attended
+	"""
+	hackathonsAttended: Int
+	"""
+	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	"""
+	links: [String!]
+	"""
+	The first line of the shipping address
+	"""
+	addressLine1: String
+	"""
+	The second line of the shipping address
+	"""
+	addressLine2: String
+	"""
+	The last line of the shipping address
+	"""
+	addressLine3: String
+	"""
+	The city/town of the shipping address
+	"""
+	locality: String
+	"""
+	The state/province/region of the shipping address
+	"""
+	administrativeArea: String
+	"""
+	The postal code of the shipping address
+	"""
+	postalCode: String
+	"""
+	The ISO code of the country the shipping address is located in
+	"""
+	country: String
+	"""
+	Whether the participant wishes to share information with sponsors
+	"""
+	shareInformation: Boolean
+}
+
+type SaveApplicationResult {
+	"""
+	The saved, but unsubmitted application
+	"""
+	draftApplication: DraftApplication
+	"""
+	Errors that may have occurred while processing the action
+	"""
+	userErrors: [UserError!]!
+}
+
+
+type SubmitApplicationResult {
+	"""
+	The submitted application
+	"""
+	application: Application
+	"""
+	Errors that may have occurred while processing the action
+	"""
+	userErrors: [UserError!]!
+}
+
+"""
+Represents and error in the input of a mutation
+"""
+type UserError @shareable {
+	"""
+	The path to the input field that caused the error
+	"""
+	field: [String!]!
+	"""
+	The error message
+	"""
+	message: String!
+}
 
 directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
