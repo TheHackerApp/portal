@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM applications WHERE participant_id = $1 AND event = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "704421f01780055161233c744f6cfe293e42aaf14b40bb7979ae5e51a4ec36d1"
+}

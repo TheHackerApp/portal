@@ -1,0 +1,190 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth, education as \"education: Education\", graduation_year, major,\n                hackathons_attended, links,\n                address_line1, address_line2, address_line3, locality,\n                administrative_area, postal_code, country,\n                share_information,\n                created_at, updated_at\n            FROM draft_applications\n            WHERE participant_id = $1 AND event = $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "event",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "participant_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "gender: Gender",
+        "type_info": {
+          "Custom": {
+            "name": "gender",
+            "kind": {
+              "Enum": [
+                "male",
+                "female",
+                "non-binary",
+                "other"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "race_ethnicity: RaceEthnicity",
+        "type_info": {
+          "Custom": {
+            "name": "race_ethnicity",
+            "kind": {
+              "Enum": [
+                "asian-indian",
+                "black",
+                "chinese",
+                "filipino",
+                "guamanian",
+                "hispanic",
+                "japanese",
+                "korean",
+                "middle-eastern",
+                "native-american",
+                "native-hawaiian",
+                "samoan",
+                "white",
+                "other-asian",
+                "other-pacific-islander",
+                "other"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "date_of_birth",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 5,
+        "name": "education: Education",
+        "type_info": {
+          "Custom": {
+            "name": "education",
+            "kind": {
+              "Enum": [
+                "below-secondary",
+                "secondary",
+                "undergraduate-two-year",
+                "undergraduate-three-year-plus",
+                "graduate",
+                "bootcamp",
+                "vocational",
+                "other",
+                "non-student"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "graduation_year",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "major",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "hackathons_attended",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "links",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 10,
+        "name": "address_line1",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "address_line2",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "address_line3",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "locality",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "administrative_area",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "postal_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "country",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 17,
+        "name": "share_information",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 18,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 19,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "8ae1b630e83c236d8ed660099226ed2802a03c3decd0c5b5c67197a0e5641f4b"
+}
