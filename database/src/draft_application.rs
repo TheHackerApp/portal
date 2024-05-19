@@ -111,6 +111,7 @@ impl DraftApplication {
         skip_all,
         fields(event = self.event, participant_id = self.participant_id)
     )]
+    #[allow(clippy::manual_async_fn)]
     pub fn save<'a, 'c, A>(&'a self, db: A) -> impl Future<Output = Result<()>> + Send + 'a
     where
         A: 'a + Acquire<'c, Database = sqlx::Postgres> + Send,

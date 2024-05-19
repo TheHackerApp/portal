@@ -14,6 +14,7 @@ macro_rules! impl_queries {
         impl $target {
             $(
                 $( #[ $meta ] )*
+                #[allow(clippy::manual_async_fn)]
                 $visibility fn $name <'a, 'c, A>(
                     $( & $self , )?
                     $($arg_name : $arg_ty , )*

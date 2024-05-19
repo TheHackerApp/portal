@@ -382,6 +382,7 @@ impl<'m> ApplicationUpdater<'m> {
             self.event = self.application.event
         )
     )]
+    #[allow(clippy::manual_async_fn)]
     pub fn save<'a, 'c, A>(self, db: A) -> impl Future<Output = Result<()>> + Send + 'a
     where
         'm: 'a,
