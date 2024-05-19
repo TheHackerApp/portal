@@ -28,7 +28,8 @@ impl Mutation {
         }
 
         let db = ctx.data_unchecked::<PgPool>();
-        if Application::exists(&scope.event, user.id, db)
+        let mut txn = db.begin().await?;
+        if Application::exists(&scope.event, user.id, &mut txn)
             .await
             .extend()?
         {
@@ -37,7 +38,7 @@ impl Mutation {
             );
         }
 
-        let application = match Application::from_draft(&scope.event, user.id, db).await {
+        let application = match Application::from_draft(&scope.event, user.id, &mut txn).await {
             Ok(application) => application,
             Err(err) => {
                 match err.as_ref() {
@@ -64,9 +65,11 @@ impl Mutation {
             }
         };
 
-        DraftApplication::delete(&scope.event, user.id, db)
+        DraftApplication::delete(&scope.event, user.id, &mut txn)
             .await
             .extend()?;
+
+        txn.commit().await?;
 
         Ok(application.into())
     }

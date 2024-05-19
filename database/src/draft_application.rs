@@ -4,6 +4,7 @@ use async_graphql::SimpleObject;
 use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Acquire};
 use std::fmt::Debug;
+use std::future::Future;
 use tracing::instrument;
 
 /// An in-progress application from a participant
@@ -87,12 +88,86 @@ impl DraftApplication {
         }
     }
 
+    /// Save the draft application
+    #[instrument(
+        name = "DraftApplication::save",
+        skip_all,
+        fields(event = self.event, participant_id = self.participant_id)
+    )]
+    pub fn save<'a, 'c, A>(&'a self, db: A) -> impl Future<Output = Result<()>> + Send + 'a
+    where
+        A: 'a + Acquire<'c, Database = sqlx::Postgres> + Send,
+    {
+        async move {
+            let mut conn = db.acquire().await?;
+            query!(
+                r#"
+                INSERT INTO draft_applications (
+                    event, participant_id,
+                    gender, race_ethnicity, date_of_birth,
+                    education, graduation_year, major,
+                    hackathons_attended, links,
+                    address_line1, address_line2, address_line3, locality, administrative_area,
+                    postal_code, country,
+                    share_information
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+                ON CONFLICT (event, participant_id)
+                DO UPDATE
+                    SET
+                        gender = excluded.gender,
+                        race_ethnicity = excluded.race_ethnicity,
+                        date_of_birth = excluded.date_of_birth,
+                        education = excluded.education,
+                        graduation_year = excluded.graduation_year,
+                        major = excluded.major,
+                        hackathons_attended = excluded.hackathons_attended,
+                        links = excluded.links,
+                        address_line1 = excluded.address_line1,
+                        address_line2 = excluded.address_line2,
+                        address_line3 = excluded.address_line3,
+                        locality = excluded.locality,
+                        administrative_area = excluded.administrative_area,
+                        postal_code = excluded.postal_code,
+                        country = excluded.country,
+                        share_information = excluded.share_information
+                    WHERE
+                        draft_applications.participant_id = excluded.participant_id
+                        AND draft_applications.event = excluded.event
+                "#,
+                self.event,
+                self.participant_id,
+                self.gender as _,
+                self.race_ethnicity as _,
+                self.date_of_birth,
+                self.education as _,
+                self.graduation_year,
+                self.major,
+                self.hackathons_attended,
+                self.links.as_deref(),
+                self.address_line1,
+                self.address_line2,
+                self.address_line3,
+                self.locality,
+                self.administrative_area,
+                self.postal_code,
+                self.country,
+                self.share_information,
+            )
+            .execute(&mut *conn)
+            .await?;
+
+            Ok(())
+        }
+    }
+}
+
+impl_queries! {
+    for DraftApplication;
+
     /// Check if a draft application exists
     #[instrument(name = "Application::exists", skip(db))]
-    pub async fn exists<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<bool>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
+    pub async fn exists(event: &'a str, participant_id: i32; db) -> Result<bool> {
         let mut conn = db.acquire().await?;
         let result = query!(
             "SELECT exists(SELECT 1 FROM draft_applications WHERE participant_id = $1 AND event = $2)",
@@ -107,14 +182,7 @@ impl DraftApplication {
 
     /// Get a draft application by the event and participant ID
     #[instrument(name = "DraftApplication::find", skip(db))]
-    pub async fn find<'a, 'c, A>(
-        event: &str,
-        participant_id: i32,
-        db: A,
-    ) -> Result<Option<DraftApplication>>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
+    pub async fn find(event: &'a str, participant_id: i32; db) -> Result<Option<DraftApplication>> {
         let mut conn = db.acquire().await?;
         let draft = query_as!(
             DraftApplication,
@@ -140,82 +208,9 @@ impl DraftApplication {
         Ok(draft)
     }
 
-    /// Save the draft application
-    #[instrument(
-        name = "DraftApplication::save",
-        skip_all,
-        fields(event = self.event, participant_id = self.participant_id)
-    )]
-    pub async fn save<'a, 'c, A>(&self, db: A) -> Result<()>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
-        query!(
-            r#"
-            INSERT INTO draft_applications (
-                event, participant_id,
-                gender, race_ethnicity, date_of_birth,
-                education, graduation_year, major,
-                hackathons_attended, links,
-                address_line1, address_line2, address_line3, locality, administrative_area,
-                postal_code, country,
-                share_information
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-            ON CONFLICT (event, participant_id)
-            DO UPDATE
-                SET
-                    gender = excluded.gender,
-                    race_ethnicity = excluded.race_ethnicity,
-                    date_of_birth = excluded.date_of_birth,
-                    education = excluded.education,
-                    graduation_year = excluded.graduation_year,
-                    major = excluded.major,
-                    hackathons_attended = excluded.hackathons_attended,
-                    links = excluded.links,
-                    address_line1 = excluded.address_line1,
-                    address_line2 = excluded.address_line2,
-                    address_line3 = excluded.address_line3,
-                    locality = excluded.locality,
-                    administrative_area = excluded.administrative_area,
-                    postal_code = excluded.postal_code,
-                    country = excluded.country,
-                    share_information = excluded.share_information
-                WHERE
-                    draft_applications.participant_id = excluded.participant_id
-                    AND draft_applications.event = excluded.event
-            "#,
-            self.event,
-            self.participant_id,
-            self.gender as _,
-            self.race_ethnicity as _,
-            self.date_of_birth,
-            self.education as _,
-            self.graduation_year,
-            self.major,
-            self.hackathons_attended,
-            self.links.as_deref(),
-            self.address_line1,
-            self.address_line2,
-            self.address_line3,
-            self.locality,
-            self.administrative_area,
-            self.postal_code,
-            self.country,
-            self.share_information,
-        )
-        .execute(&mut *conn)
-        .await?;
-
-        Ok(())
-    }
-
     /// Delete a draft application
     #[instrument(name = "DraftApplication::delete", skip(db))]
-    pub async fn delete<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<()>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
+    pub async fn delete(event: &'a str, participant_id: i32; db) -> Result<()>
     {
         let mut conn = db.acquire().await?;
         query!(

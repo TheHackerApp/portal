@@ -33,8 +33,9 @@ impl Mutation {
         }
 
         let db = ctx.data_unchecked::<PgPool>();
+        let mut txn = db.begin().await?;
 
-        if Application::exists(&scope.event, user.id, db)
+        if Application::exists(&scope.event, user.id, &mut txn)
             .await
             .extend()?
         {
@@ -43,7 +44,7 @@ impl Mutation {
             );
         }
 
-        let mut draft = DraftApplication::find(&scope.event, user.id, db)
+        let mut draft = DraftApplication::find(&scope.event, user.id, &mut txn)
             .await
             .extend()?
             .unwrap_or_else(|| DraftApplication::new(scope.event.clone(), user.id));
@@ -65,7 +66,9 @@ impl Mutation {
         draft.country = input.country;
         draft.share_information = input.share_information;
 
-        draft.save(db).await.extend()?;
+        draft.save(&mut txn).await.extend()?;
+
+        txn.commit().await?;
 
         Ok(draft.into())
     }

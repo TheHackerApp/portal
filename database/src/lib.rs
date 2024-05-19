@@ -12,6 +12,8 @@ use std::{
 };
 use tracing::{info, instrument, log::LevelFilter};
 
+#[macro_use]
+mod macros;
 mod application;
 mod draft_application;
 

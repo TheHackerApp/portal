@@ -3,6 +3,7 @@ use crate::Result;
 use async_graphql::{ComplexObject, Enum, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Acquire, QueryBuilder};
+use std::future::Future;
 use tracing::instrument;
 
 /// A person's gender
@@ -154,14 +155,13 @@ impl Application {
     }
 }
 
-impl Application {
+impl_queries! {
+    for Application;
+
     /// Check if an application exists
-    #[instrument(name = "Application::exists", skip(db))]
-    pub async fn exists<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<bool>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
+    #[instrument(name = "Application::exists", skip(conn))]
+    pub async fn exists(event: &'a str, participant_id: i32; conn) -> Result<bool> {
+        let mut conn = conn.acquire().await?;
         let result = query!(
             "SELECT exists(SELECT 1 FROM applications WHERE participant_id = $1 AND event = $2)",
             participant_id,
@@ -174,12 +174,9 @@ impl Application {
     }
 
     /// Get all the submitted applications for an event
-    #[instrument(name = "Application::all", skip(db))]
-    pub async fn all<'a, 'c, A>(event: &str, db: A) -> Result<Vec<Application>>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
+    #[instrument(name = "Application::all", skip(conn))]
+    pub async fn all(event: &'a str; conn) -> Result<Vec<Application>> {
+        let mut conn = conn.acquire().await?;
         let applications = query_as!(
             Application,
             r#"
@@ -205,16 +202,9 @@ impl Application {
     }
 
     /// Get an application by its event and participant id
-    #[instrument(name = "Application::find", skip(db))]
-    pub async fn find<'a, 'c, A>(
-        event: &str,
-        participant_id: i32,
-        db: A,
-    ) -> Result<Option<Application>>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
+    #[instrument(name = "Application::find", skip(conn))]
+    pub async fn find(event: &'a str, participant_id: i32; conn) -> Result<Option<Application>> {
+        let mut conn = conn.acquire().await?;
         let application = query_as!(
             Application,
             r#"
@@ -241,12 +231,9 @@ impl Application {
     }
 
     /// Create a new application from a draft
-    #[instrument(name = "Application::from_draft", skip(db))]
-    pub async fn from_draft<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<Self>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
+    #[instrument(name = "Application::from_draft", skip(conn))]
+    pub async fn from_draft(event: &'a str, participant_id: i32; conn) -> Result<Self> {
+        let mut conn = conn.acquire().await?;
         let application = query_as!(
             Application,
             r#"
@@ -282,18 +269,10 @@ impl Application {
         Ok(application)
     }
 
-    /// Update the application's fields
-    pub fn update(&mut self) -> ApplicationUpdater<'_> {
-        ApplicationUpdater::new(self)
-    }
-
     /// Delete an application
-    #[instrument(name = "Application::delete", skip(db))]
-    pub async fn delete<'a, 'c, A>(event: &str, participant_id: i32, db: A) -> Result<()>
-    where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
-    {
-        let mut conn = db.acquire().await?;
+    #[instrument(name = "Application::delete", skip(conn))]
+    pub async fn delete(event: &'a str, participant_id: i32; conn) -> Result<()> {
+        let mut conn = conn.acquire().await?;
         query!(
             "DELETE FROM applications WHERE participant_id = $1 AND event = $2",
             participant_id,
@@ -303,6 +282,13 @@ impl Application {
         .await?;
 
         Ok(())
+    }
+}
+
+impl Application {
+    /// Update the application's fields
+    pub fn update(&mut self) -> ApplicationUpdater<'_> {
+        ApplicationUpdater::new(self)
     }
 }
 
@@ -382,53 +368,56 @@ impl<'m> ApplicationUpdater<'m> {
             self.event = self.application.event
         )
     )]
-    pub async fn save<'a, 'c, A>(self, db: A) -> Result<()>
+    pub fn save<'a, 'c, A>(self, db: A) -> impl Future<Output = Result<()>> + Send + 'a
     where
-        A: 'a + Acquire<'c, Database = sqlx::Postgres>,
+        'm: 'a,
+        A: 'a + Acquire<'c, Database = sqlx::Postgres> + Send,
     {
-        if self.status.is_none() && self.flagged.is_none() && self.notes.is_none() {
-            // nothing was changed
-            return Ok(());
+        async move {
+            if self.status.is_none() && self.flagged.is_none() && self.notes.is_none() {
+                // nothing was changed
+                return Ok(());
+            }
+
+            let mut builder = QueryBuilder::new("UPDATE applications SET ");
+            let mut separated = builder.separated(", ");
+
+            if let Some(status) = self.status {
+                separated.push("status = ");
+                separated.push_bind_unseparated(status);
+            }
+
+            if let Some(flagged) = self.flagged {
+                separated.push("flagged = ");
+                separated.push_bind_unseparated(flagged);
+            }
+
+            if let Some(notes) = &self.notes {
+                separated.push("notes = ");
+                separated.push_bind_unseparated(notes);
+            }
+
+            builder.push(" WHERE participant_id = ");
+            builder.push_bind(self.application.participant_id);
+            builder.push(" AND event = ");
+            builder.push_bind(&self.application.event);
+
+            let mut conn = db.acquire().await?;
+            builder.build().execute(&mut *conn).await?;
+
+            if let Some(status) = self.status {
+                self.application.status = status;
+            }
+
+            if let Some(flagged) = self.flagged {
+                self.application.flagged = flagged;
+            }
+
+            if let Some(notes) = self.notes {
+                self.application.notes = notes;
+            }
+
+            Ok(())
         }
-
-        let mut builder = QueryBuilder::new("UPDATE applications SET ");
-        let mut separated = builder.separated(", ");
-
-        if let Some(status) = self.status {
-            separated.push("status = ");
-            separated.push_bind_unseparated(status);
-        }
-
-        if let Some(flagged) = self.flagged {
-            separated.push("flagged = ");
-            separated.push_bind_unseparated(flagged);
-        }
-
-        if let Some(notes) = &self.notes {
-            separated.push("notes = ");
-            separated.push_bind_unseparated(notes);
-        }
-
-        builder.push(" WHERE participant_id = ");
-        builder.push_bind(self.application.participant_id);
-        builder.push(" AND event = ");
-        builder.push_bind(&self.application.event);
-
-        let mut conn = db.acquire().await?;
-        builder.build().execute(&mut *conn).await?;
-
-        if let Some(status) = self.status {
-            self.application.status = status;
-        }
-
-        if let Some(flagged) = self.flagged {
-            self.application.flagged = flagged;
-        }
-
-        if let Some(notes) = self.notes {
-            self.application.notes = notes;
-        }
-
-        Ok(())
     }
 }
