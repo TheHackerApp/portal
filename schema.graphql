@@ -255,8 +255,9 @@ scalar NaiveDate
 """
 Stub for a participant in the identity service
 """
-type Participant @key(fields: "id", resolvable: false) {
-	id: Int!
+type Participant @key(fields: "event { slug } user { id }", resolvable: false) {
+	event: Event!
+	user: User!
 }
 
 type Query {
@@ -388,6 +389,13 @@ type SubmitApplicationResult {
 	Errors that may have occurred while processing the action
 	"""
 	userErrors: [UserError!]!
+}
+
+"""
+Stub for a user in the identity service
+"""
+type User @key(fields: "id", resolvable: false) {
+	id: Int!
 }
 
 """

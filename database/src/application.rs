@@ -150,9 +150,7 @@ impl Application {
 
     /// The participant who submitted the application
     async fn participant(&self) -> Participant {
-        Participant {
-            id: self.participant_id,
-        }
+        Participant::new(self.participant_id, &self.event)
     }
 
     /// The applicant's shipping address
