@@ -4,7 +4,59 @@ name: Deploy
 "on":
   - push
 
+env:
+  IMAGE_REGISTRY: ${{ secrets.IMAGES_LOCATION }}-docker.pkg.dev/${{ secrets.IMAGES_PROJECT_ID }}/portal
+
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: TheHackerApp/setup-ssh@main
+        with:
+          private-key: ${{ secrets.SHIPYARD_SSH_KEY }}
+          host: ssh.shipyard.rs
+
+      - uses: TheHackerApp/setup-artifact-registry@main
+        with:
+          registries: ${{ secrets.IMAGES_LOCATION }}-docker.pkg.dev
+          project_id: ${{ secrets.IMAGES_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.IMAGES_WORKLOAD_IDENTITY_PROVIDER }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.IMAGE_REGISTRY }}/service
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=deploy-,enable={{is_default_branch}}
+            type=sha
+
+      - uses: docker/build-push-action@v5
+        with:
+          push: true
+          sbom: true
+          provenance: mode=max
+
+          secrets: |
+            shipyard-token=${{ secrets.SHIPYARD_TOKEN }}
+          ssh: |
+            default=${{ env.SSH_AUTH_SOCK }}
+
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+
+          cache-to: type=gha,mode=max
+          cache-from: type=gha
+
   composition:
     name: Check Schema Composition
     runs-on: ubuntu-22.04
