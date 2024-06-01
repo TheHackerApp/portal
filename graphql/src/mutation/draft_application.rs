@@ -94,7 +94,7 @@ struct SaveApplicationInput {
     /// How many hackathons the participant has attended
     pub hackathons_attended: Option<i32>,
     /// Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
-    pub links: Option<Vec<String>>,
+    pub links: Vec<String>,
 
     /// The first line of the shipping address
     pub address_line1: Option<String>,
@@ -112,5 +112,5 @@ struct SaveApplicationInput {
     pub country: Option<String>,
 
     /// Whether the participant wishes to share information with sponsors
-    pub share_information: Option<bool>,
+    pub share_information: bool,
 }

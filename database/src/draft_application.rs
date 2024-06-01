@@ -37,7 +37,7 @@ pub struct DraftApplication {
     /// How many hackathons the participant has attended
     pub hackathons_attended: Option<i32>,
     /// Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
-    pub links: Option<Vec<String>>,
+    pub links: Vec<String>,
 
     /// The first line of the shipping address
     pub address_line1: Option<String>,
@@ -55,7 +55,7 @@ pub struct DraftApplication {
     pub country: Option<String>,
 
     /// Whether the participant wishes to share information with sponsors
-    pub share_information: Option<bool>,
+    pub share_information: bool,
 
     /// When the application was submitted
     pub created_at: DateTime<Utc>,
@@ -89,7 +89,7 @@ impl DraftApplication {
             graduation_year: None,
             major: None,
             hackathons_attended: None,
-            links: None,
+            links: Vec::new(),
             address_line1: None,
             address_line2: None,
             address_line3: None,
@@ -97,7 +97,7 @@ impl DraftApplication {
             administrative_area: None,
             postal_code: None,
             country: None,
-            share_information: None,
+            share_information: true,
             created_at: Utc::now(),
             updated_at: Utc::now(),
         }
@@ -160,7 +160,7 @@ impl DraftApplication {
                 self.graduation_year,
                 self.major,
                 self.hackathons_attended,
-                self.links.as_deref(),
+                &self.links,
                 self.address_line1,
                 self.address_line2,
                 self.address_line3,
