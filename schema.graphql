@@ -333,7 +333,7 @@ input SaveApplicationInput {
 	"""
 	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
 	"""
-	links: [String!]!
+	links: [String!]
 	"""
 	The first line of the shipping address
 	"""
@@ -365,7 +365,7 @@ input SaveApplicationInput {
 	"""
 	Whether the participant wishes to share information with sponsors
 	"""
-	shareInformation: Boolean!
+	shareInformation: Boolean
 }
 
 type SaveApplicationResult {
