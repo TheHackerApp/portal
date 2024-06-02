@@ -66,9 +66,9 @@ impl Mutation {
         set_option!(input.graduation_year => draft.graduation_year);
         set_option!(input.major => draft.major);
         set_option!(input.hackathons_attended => draft.hackathons_attended);
-        if let Some(links) = input.links {
-            draft.links = links;
-        }
+        set_option!(input.vcs_url => draft.vcs_url);
+        set_option!(input.portfolio_url => draft.portfolio_url);
+        set_option!(input.devpost_url => draft.devpost_url);
         set_option!(input.address_line1 => draft.address_line1);
         set_option!(input.address_line2 => draft.address_line2);
         set_option!(input.address_line3 => draft.address_line3);
@@ -107,8 +107,12 @@ struct SaveApplicationInput {
 
     /// How many hackathons the participant has attended
     pub hackathons_attended: MaybeUndefined<i32>,
-    /// Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
-    pub links: Option<Vec<String>>,
+    /// The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
+    pub vcs_url: MaybeUndefined<String>,
+    /// The URL to the participant's portfolio
+    pub portfolio_url: MaybeUndefined<String>,
+    /// The URL to the participant's DevPost profile
+    pub devpost_url: MaybeUndefined<String>,
 
     /// The first line of the shipping address
     pub address_line1: MaybeUndefined<String>,

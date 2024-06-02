@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO applications (\n                event, participant_id,\n                gender, race_ethnicity, date_of_birth,\n                education, graduation_year, major,\n                hackathons_attended, links,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country,\n                share_information,\n                created_at, updated_at\n            )\n            SELECT * FROM draft_applications\n            WHERE participant_id = $1 AND event = $2\n            RETURNING\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth,\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, links,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            ",
+  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth,\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            FROM applications\n            WHERE participant_id = $1 AND event = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -103,51 +103,61 @@
       },
       {
         "ordinal": 9,
-        "name": "links",
-        "type_info": "TextArray"
+        "name": "vcs_url",
+        "type_info": "Text"
       },
       {
         "ordinal": 10,
-        "name": "address_line1",
+        "name": "portfolio_url",
         "type_info": "Text"
       },
       {
         "ordinal": 11,
-        "name": "address_line2",
+        "name": "devpost_url",
         "type_info": "Text"
       },
       {
         "ordinal": 12,
-        "name": "address_line3",
+        "name": "address_line1",
         "type_info": "Text"
       },
       {
         "ordinal": 13,
-        "name": "locality",
+        "name": "address_line2",
         "type_info": "Text"
       },
       {
         "ordinal": 14,
-        "name": "administrative_area",
+        "name": "address_line3",
         "type_info": "Text"
       },
       {
         "ordinal": 15,
-        "name": "postal_code",
+        "name": "locality",
         "type_info": "Text"
       },
       {
         "ordinal": 16,
-        "name": "country",
+        "name": "administrative_area",
         "type_info": "Text"
       },
       {
         "ordinal": 17,
+        "name": "postal_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "country",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
         "name": "share_information",
         "type_info": "Bool"
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "status: ApplicationStatus",
         "type_info": {
           "Custom": {
@@ -164,22 +174,22 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "flagged",
         "type_info": "Bool"
       },
       {
-        "ordinal": 20,
+        "ordinal": 22,
         "name": "notes",
         "type_info": "Text"
       },
       {
-        "ordinal": 21,
+        "ordinal": 23,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 22,
+        "ordinal": 24,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
@@ -200,7 +210,9 @@
       false,
       true,
       false,
-      false,
+      true,
+      true,
+      true,
       false,
       true,
       true,
@@ -216,5 +228,5 @@
       false
     ]
   },
-  "hash": "0738365da8af10d10bf54d250be9ef379f1db686aa40c839876f778abfd7e32a"
+  "hash": "f6d39d8c76f1d0bc648eb03bca71b641a0f5536e95d8f357f0b3c7c5155307f4"
 }

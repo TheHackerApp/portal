@@ -98,8 +98,12 @@ pub struct Application {
 
     /// How many hackathons the participant has attended
     pub hackathons_attended: i32,
-    /// Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
-    pub links: Vec<String>,
+    /// The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
+    pub vcs_url: Option<String>,
+    /// The URL to the participant's portfolio
+    pub portfolio_url: Option<String>,
+    /// The URL to the participant's DevPost profile
+    pub devpost_url: Option<String>,
 
     /// The first line of the shipping address
     #[cfg_attr(feature = "graphql", graphql(skip))]
@@ -197,7 +201,7 @@ impl_queries! {
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth,
                 education as "education: Education", graduation_year, major,
-                hackathons_attended, links,
+                hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,
                 status as "status: ApplicationStatus", flagged, notes,
@@ -225,7 +229,7 @@ impl_queries! {
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth,
                 education as "education: Education", graduation_year, major,
-                hackathons_attended, links,
+                hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,
                 status as "status: ApplicationStatus", flagged, notes,
@@ -253,11 +257,12 @@ impl_queries! {
                 event, participant_id,
                 gender, race_ethnicity, date_of_birth,
                 education, graduation_year, major,
-                hackathons_attended, links,
+                hackathons_attended,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country,
                 share_information,
-                created_at, updated_at
+                created_at, updated_at,
+                vcs_url, portfolio_url, devpost_url
             )
             SELECT * FROM draft_applications
             WHERE participant_id = $1 AND event = $2
@@ -266,7 +271,7 @@ impl_queries! {
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth,
                 education as "education: Education", graduation_year, major,
-                hackathons_attended, links,
+                hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,
                 status as "status: ApplicationStatus", flagged, notes,

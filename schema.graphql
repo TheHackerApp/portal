@@ -44,9 +44,17 @@ type Application {
 	"""
 	hackathonsAttended: Int!
 	"""
-	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
 	"""
-	links: [String!]!
+	vcsUrl: String
+	"""
+	The URL to the participant's portfolio
+	"""
+	portfolioUrl: String
+	"""
+	The URL to the participant's DevPost profile
+	"""
+	devpostUrl: String
 	"""
 	Whether the participant wishes to share information with sponsors
 	"""
@@ -136,9 +144,17 @@ type DraftApplication {
 	"""
 	hackathonsAttended: Int
 	"""
-	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
 	"""
-	links: [String!]!
+	vcsUrl: String
+	"""
+	The URL to the participant's portfolio
+	"""
+	portfolioUrl: String
+	"""
+	The URL to the participant's DevPost profile
+	"""
+	devpostUrl: String
 	"""
 	The first line of the shipping address
 	"""
@@ -331,9 +347,17 @@ input SaveApplicationInput {
 	"""
 	hackathonsAttended: Int
 	"""
-	Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
+	The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
 	"""
-	links: [String!]
+	vcsUrl: String
+	"""
+	The URL to the participant's portfolio
+	"""
+	portfolioUrl: String
+	"""
+	The URL to the participant's DevPost profile
+	"""
+	devpostUrl: String
 	"""
 	The first line of the shipping address
 	"""

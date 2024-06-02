@@ -36,8 +36,12 @@ pub struct DraftApplication {
 
     /// How many hackathons the participant has attended
     pub hackathons_attended: Option<i32>,
-    /// Public links the participant wishes to share (i.e. portfolio, GitHub, etc.)
-    pub links: Vec<String>,
+    /// The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
+    pub vcs_url: Option<String>,
+    /// The URL to the participant's portfolio
+    pub portfolio_url: Option<String>,
+    /// The URL to the participant's DevPost profile
+    pub devpost_url: Option<String>,
 
     /// The first line of the shipping address
     pub address_line1: Option<String>,
@@ -89,7 +93,9 @@ impl DraftApplication {
             graduation_year: None,
             major: None,
             hackathons_attended: None,
-            links: Vec::new(),
+            vcs_url: None,
+            portfolio_url: None,
+            devpost_url: None,
             address_line1: None,
             address_line2: None,
             address_line3: None,
@@ -122,12 +128,12 @@ impl DraftApplication {
                     event, participant_id,
                     gender, race_ethnicity, date_of_birth,
                     education, graduation_year, major,
-                    hackathons_attended, links,
+                    hackathons_attended, vcs_url, portfolio_url, devpost_url,
                     address_line1, address_line2, address_line3, locality, administrative_area,
                     postal_code, country,
                     share_information
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
                 ON CONFLICT (event, participant_id)
                 DO UPDATE
                     SET
@@ -138,7 +144,9 @@ impl DraftApplication {
                         graduation_year = excluded.graduation_year,
                         major = excluded.major,
                         hackathons_attended = excluded.hackathons_attended,
-                        links = excluded.links,
+                        vcs_url = excluded.vcs_url,
+                        portfolio_url = excluded.portfolio_url,
+                        devpost_url = excluded.devpost_url,
                         address_line1 = excluded.address_line1,
                         address_line2 = excluded.address_line2,
                         address_line3 = excluded.address_line3,
@@ -160,7 +168,9 @@ impl DraftApplication {
                 self.graduation_year,
                 self.major,
                 self.hackathons_attended,
-                &self.links,
+                self.vcs_url,
+                self.portfolio_url,
+                self.devpost_url,
                 self.address_line1,
                 self.address_line2,
                 self.address_line3,
@@ -207,7 +217,7 @@ impl_queries! {
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth, education as "education: Education", graduation_year, major,
-                hackathons_attended, links,
+                hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality,
                 administrative_area, postal_code, country,
                 share_information,
