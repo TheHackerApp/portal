@@ -3,7 +3,7 @@ use crate::errors::Forbidden;
 use async_graphql::{Context, InputObject, MaybeUndefined, Object, Result, ResultExt};
 use chrono::NaiveDate;
 use context::{checks, UserRole};
-use database::{Application, DraftApplication, Education, Gender, PgPool, RaceEthnicity};
+use database::{Application, DraftApplication, Education, Gender, PgPool, RaceEthnicity, Referrer};
 use tracing::instrument;
 
 results! {
@@ -62,6 +62,7 @@ impl Mutation {
         set_option!(input.gender => draft.gender);
         set_option!(input.race_ethnicity => draft.race_ethnicity);
         set_option!(input.date_of_birth => draft.date_of_birth);
+        set_option!(input.referrer => draft.referrer);
         set_option!(input.education => draft.education);
         set_option!(input.graduation_year => draft.graduation_year);
         set_option!(input.major => draft.major);
@@ -97,6 +98,8 @@ struct SaveApplicationInput {
     pub race_ethnicity: MaybeUndefined<RaceEthnicity>,
     /// Participant birthday
     pub date_of_birth: MaybeUndefined<NaiveDate>,
+    /// How the participant found the event
+    pub referrer: MaybeUndefined<Referrer>,
 
     /// The highest level of education the participant has achieved/is working on
     pub education: MaybeUndefined<Education>,

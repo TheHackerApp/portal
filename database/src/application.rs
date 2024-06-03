@@ -59,6 +59,21 @@ pub enum Education {
     NonStudent,
 }
 
+/// Where a person found the event
+#[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
+#[cfg_attr(feature = "graphql", derive(Enum))]
+#[sqlx(rename_all = "kebab-case", type_name = "referrer")]
+pub enum Referrer {
+    Search,
+    Peer,
+    SocialMedia,
+    Blog,
+    Advertisement,
+    StudentOrganization,
+    School,
+    Other,
+}
+
 /// The status of an application
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
@@ -88,6 +103,8 @@ pub struct Application {
     pub race_ethnicity: RaceEthnicity,
     /// Participant birthday
     pub date_of_birth: NaiveDate,
+    /// How the participant found the event
+    pub referrer: Option<Referrer>,
 
     /// The highest level of education the participant has achieved/is working on
     pub education: Education,
@@ -199,7 +216,7 @@ impl_queries! {
             SELECT
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
-                date_of_birth,
+                date_of_birth, referrer as "referrer: Referrer",
                 education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
@@ -227,7 +244,7 @@ impl_queries! {
             SELECT
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
-                date_of_birth,
+                date_of_birth, referrer as "referrer: Referrer",
                 education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
@@ -262,14 +279,15 @@ impl_queries! {
                 postal_code, country,
                 share_information,
                 created_at, updated_at,
-                vcs_url, portfolio_url, devpost_url
+                vcs_url, portfolio_url, devpost_url,
+                referrer
             )
             SELECT * FROM draft_applications
             WHERE participant_id = $1 AND event = $2
             RETURNING
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
-                date_of_birth,
+                date_of_birth, referrer as "referrer: Referrer",
                 education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,

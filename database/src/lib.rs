@@ -19,7 +19,7 @@ mod draft_application;
 #[cfg(feature = "graphql")]
 mod stubs;
 
-pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity};
+pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity, Referrer};
 pub use draft_application::DraftApplication;
 pub use sqlx::{Error as SqlxError, PgPool};
 

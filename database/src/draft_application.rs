@@ -1,6 +1,6 @@
 #[cfg(feature = "graphql")]
 use crate::stubs::{Event, Participant};
-use crate::{Education, Gender, RaceEthnicity, Result};
+use crate::{Education, Gender, RaceEthnicity, Referrer, Result};
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
@@ -26,6 +26,8 @@ pub struct DraftApplication {
     pub race_ethnicity: Option<RaceEthnicity>,
     /// Participant birthday
     pub date_of_birth: Option<NaiveDate>,
+    /// How the participant found the event
+    pub referrer: Option<Referrer>,
 
     /// The highest level of education the participant has achieved/is working on
     pub education: Option<Education>,
@@ -89,6 +91,7 @@ impl DraftApplication {
             gender: None,
             race_ethnicity: None,
             date_of_birth: None,
+            referrer: None,
             education: None,
             graduation_year: None,
             major: None,
@@ -126,20 +129,21 @@ impl DraftApplication {
                 r#"
                 INSERT INTO draft_applications (
                     event, participant_id,
-                    gender, race_ethnicity, date_of_birth,
+                    gender, race_ethnicity, date_of_birth, referrer,
                     education, graduation_year, major,
                     hackathons_attended, vcs_url, portfolio_url, devpost_url,
                     address_line1, address_line2, address_line3, locality, administrative_area,
                     postal_code, country,
                     share_information
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
                 ON CONFLICT (event, participant_id)
                 DO UPDATE
                     SET
                         gender = excluded.gender,
                         race_ethnicity = excluded.race_ethnicity,
                         date_of_birth = excluded.date_of_birth,
+                        referrer = excluded.referrer,
                         education = excluded.education,
                         graduation_year = excluded.graduation_year,
                         major = excluded.major,
@@ -164,6 +168,7 @@ impl DraftApplication {
                 self.gender as _,
                 self.race_ethnicity as _,
                 self.date_of_birth,
+                self.referrer as _,
                 self.education as _,
                 self.graduation_year,
                 self.major,
@@ -216,7 +221,8 @@ impl_queries! {
             SELECT
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
-                date_of_birth, education as "education: Education", graduation_year, major,
+                date_of_birth, referrer as "referrer: Referrer",
+                education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality,
                 administrative_area, postal_code, country,
