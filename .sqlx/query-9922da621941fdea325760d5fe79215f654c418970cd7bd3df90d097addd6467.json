@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth,\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            FROM applications\n            WHERE event = $1\n            ",
+  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth, referrer as \"referrer: Referrer\",\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            FROM applications\n            WHERE participant_id = $1 AND event = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -66,6 +66,27 @@
       },
       {
         "ordinal": 5,
+        "name": "referrer: Referrer",
+        "type_info": {
+          "Custom": {
+            "name": "referrer",
+            "kind": {
+              "Enum": [
+                "search",
+                "peer",
+                "social-media",
+                "blog",
+                "advertisement",
+                "school",
+                "student-organization",
+                "other"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "education: Education",
         "type_info": {
           "Custom": {
@@ -87,77 +108,77 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "graduation_year",
         "type_info": "Int4"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "major",
         "type_info": "Text"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "hackathons_attended",
         "type_info": "Int4"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "vcs_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "portfolio_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "devpost_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "address_line1",
         "type_info": "Text"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "address_line2",
         "type_info": "Text"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "address_line3",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "locality",
         "type_info": "Text"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "administrative_area",
         "type_info": "Text"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "postal_code",
         "type_info": "Text"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "country",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "share_information",
         "type_info": "Bool"
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "status: ApplicationStatus",
         "type_info": {
           "Custom": {
@@ -174,28 +195,29 @@
         }
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "flagged",
         "type_info": "Bool"
       },
       {
-        "ordinal": 22,
+        "ordinal": 23,
         "name": "notes",
         "type_info": "Text"
       },
       {
-        "ordinal": 23,
+        "ordinal": 24,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
+        "Int4",
         "Text"
       ]
     },
@@ -205,6 +227,7 @@
       false,
       false,
       false,
+      true,
       false,
       false,
       true,
@@ -227,5 +250,5 @@
       false
     ]
   },
-  "hash": "49b6f458bfa1ddfeb5935da1cbb0cd49f5677de2d195d53529e83f83d7f570e8"
+  "hash": "9922da621941fdea325760d5fe79215f654c418970cd7bd3df90d097addd6467"
 }

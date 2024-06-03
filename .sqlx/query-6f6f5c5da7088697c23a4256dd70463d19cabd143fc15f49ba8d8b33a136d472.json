@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO applications (\n                event, participant_id,\n                gender, race_ethnicity, date_of_birth,\n                education, graduation_year, major,\n                hackathons_attended,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country,\n                share_information,\n                created_at, updated_at,\n                vcs_url, portfolio_url, devpost_url\n            )\n            SELECT * FROM draft_applications\n            WHERE participant_id = $1 AND event = $2\n            RETURNING\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth,\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            ",
+  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth, referrer as \"referrer: Referrer\",\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality,\n                administrative_area, postal_code, country,\n                share_information,\n                created_at, updated_at\n            FROM draft_applications\n            WHERE participant_id = $1 AND event = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -66,6 +66,27 @@
       },
       {
         "ordinal": 5,
+        "name": "referrer: Referrer",
+        "type_info": {
+          "Custom": {
+            "name": "referrer",
+            "kind": {
+              "Enum": [
+                "search",
+                "peer",
+                "social-media",
+                "blog",
+                "advertisement",
+                "school",
+                "student-organization",
+                "other"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "education: Education",
         "type_info": {
           "Custom": {
@@ -87,109 +108,82 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "graduation_year",
         "type_info": "Int4"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "major",
         "type_info": "Text"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "hackathons_attended",
         "type_info": "Int4"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "vcs_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "portfolio_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "devpost_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "address_line1",
         "type_info": "Text"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "address_line2",
         "type_info": "Text"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "address_line3",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "locality",
         "type_info": "Text"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "administrative_area",
         "type_info": "Text"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "postal_code",
         "type_info": "Text"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "country",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "share_information",
         "type_info": "Bool"
       },
       {
-        "ordinal": 20,
-        "name": "status: ApplicationStatus",
-        "type_info": {
-          "Custom": {
-            "name": "application_status",
-            "kind": {
-              "Enum": [
-                "pending",
-                "waitlisted",
-                "rejected",
-                "accepted"
-              ]
-            }
-          }
-        }
-      },
-      {
         "ordinal": 21,
-        "name": "flagged",
-        "type_info": "Bool"
-      },
-      {
-        "ordinal": 22,
-        "name": "notes",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 23,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 24,
+        "ordinal": 22,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
@@ -203,30 +197,28 @@
     "nullable": [
       false,
       false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
       true,
       true,
       true,
       true,
-      false,
-      false,
-      false,
-      false,
-      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
       false,
       false,
       false
     ]
   },
-  "hash": "cc7f88f073c1ca8f9daf46d6b0015b707ee7beeefc92049f26ffeac4cb0ae015"
+  "hash": "6f6f5c5da7088697c23a4256dd70463d19cabd143fc15f49ba8d8b33a136d472"
 }
