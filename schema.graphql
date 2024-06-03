@@ -28,6 +28,10 @@ type Application {
 	"""
 	dateOfBirth: NaiveDate!
 	"""
+	How the participant found the event
+	"""
+	referrer: Referrer
+	"""
 	The highest level of education the participant has achieved/is working on
 	"""
 	education: Education!
@@ -127,6 +131,10 @@ type DraftApplication {
 	Participant birthday
 	"""
 	dateOfBirth: NaiveDate
+	"""
+	How the participant found the event
+	"""
+	referrer: Referrer
 	"""
 	The highest level of education the participant has achieved/is working on
 	"""
@@ -315,6 +323,20 @@ enum RaceEthnicity {
 }
 
 """
+Where a person found the event
+"""
+enum Referrer {
+	SEARCH
+	PEER
+	SOCIAL_MEDIA
+	BLOG
+	ADVERTISEMENT
+	STUDENT_ORGANIZATION
+	SCHOOL
+	OTHER
+}
+
+"""
 Input fields for saving an in-progress application
 """
 input SaveApplicationInput {
@@ -330,6 +352,10 @@ input SaveApplicationInput {
 	Participant birthday
 	"""
 	dateOfBirth: NaiveDate
+	"""
+	How the participant found the event
+	"""
+	referrer: Referrer
 	"""
 	The highest level of education the participant has achieved/is working on
 	"""
