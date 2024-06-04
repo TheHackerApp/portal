@@ -16,6 +16,7 @@ use tracing::{info, instrument, log::LevelFilter};
 mod macros;
 mod application;
 mod draft_application;
+mod school;
 #[cfg(feature = "graphql")]
 mod stubs;
 

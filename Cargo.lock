@@ -157,6 +157,7 @@ dependencies = [
  "serde_urlencoded",
  "static_assertions_next",
  "thiserror",
+ "uuid",
 ]
 
 [[package]]
@@ -692,6 +693,7 @@ dependencies = [
  "sqlx",
  "tokio",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -2490,6 +2492,7 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "url",
+ "uuid",
  "webpki-roots",
 ]
 
@@ -2572,6 +2575,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2611,6 +2615,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2636,6 +2641,7 @@ dependencies = [
  "tracing",
  "url",
  "urlencoding",
+ "uuid",
 ]
 
 [[package]]
@@ -3202,6 +3208,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a183cf7feeba97b4dd1c0d46788634f6221d87fa961b305bed08c851829efcc0"
 dependencies = [
  "getrandom",
+ "serde",
 ]
 
 [[package]]
