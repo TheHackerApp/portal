@@ -215,6 +215,10 @@ type DraftApplication {
 	The participant who submitted the application
 	"""
 	participant: Participant!
+	"""
+	The school the participant attends
+	"""
+	school: School
 }
 
 """
