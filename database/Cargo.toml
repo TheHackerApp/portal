@@ -11,7 +11,7 @@ eyre.workspace = true
 sqlx = { workspace = true, features = ["chrono", "macros", "uuid"] }
 tracing.workspace = true
 tokio = { workspace = true, optional = true }
-uuid = "1.8"
+uuid.workspace = true
 
 [features]
 default = []

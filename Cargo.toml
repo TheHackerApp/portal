@@ -36,6 +36,7 @@ logging = { version = "0.3", registry = "wafflehacks" }
 sqlx = { version = "0.7", features = ["postgres", "runtime-tokio", "tls-rustls"] }
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 tracing = { version = "0.1", features = ["log"] }
+uuid = "1.8"
 
 database = { path = "./database" }
 graphql = { path = "./graphql" }

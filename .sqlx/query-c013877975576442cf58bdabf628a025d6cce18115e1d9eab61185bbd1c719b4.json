@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO applications (\n                event, participant_id,\n                gender, race_ethnicity, date_of_birth,\n                education, graduation_year, major,\n                hackathons_attended,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country,\n                share_information,\n                created_at, updated_at,\n                vcs_url, portfolio_url, devpost_url,\n                referrer\n            )\n            SELECT * FROM draft_applications\n            WHERE participant_id = $1 AND event = $2\n            RETURNING\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth, referrer as \"referrer: Referrer\",\n                education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            ",
+  "query": "\n            SELECT\n                event, participant_id,\n                gender as \"gender: Gender\", race_ethnicity as \"race_ethnicity: RaceEthnicity\",\n                date_of_birth, referrer as \"referrer: Referrer\",\n                school_id, education as \"education: Education\", graduation_year, major,\n                hackathons_attended, vcs_url, portfolio_url, devpost_url,\n                address_line1, address_line2, address_line3, locality, administrative_area,\n                postal_code, country, share_information,\n                status as \"status: ApplicationStatus\", flagged, notes,\n                created_at, updated_at\n            FROM applications\n            WHERE event = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -87,6 +87,11 @@
       },
       {
         "ordinal": 6,
+        "name": "school_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
         "name": "education: Education",
         "type_info": {
           "Custom": {
@@ -108,77 +113,77 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "graduation_year",
         "type_info": "Int4"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "major",
         "type_info": "Text"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "hackathons_attended",
         "type_info": "Int4"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "vcs_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "portfolio_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "devpost_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "address_line1",
         "type_info": "Text"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "address_line2",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "address_line3",
         "type_info": "Text"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "locality",
         "type_info": "Text"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "administrative_area",
         "type_info": "Text"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "postal_code",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "country",
         "type_info": "Text"
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "share_information",
         "type_info": "Bool"
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "status: ApplicationStatus",
         "type_info": {
           "Custom": {
@@ -195,29 +200,28 @@
         }
       },
       {
-        "ordinal": 22,
+        "ordinal": 23,
         "name": "flagged",
         "type_info": "Bool"
       },
       {
-        "ordinal": 23,
+        "ordinal": 24,
         "name": "notes",
         "type_info": "Text"
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 25,
+        "ordinal": 26,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
-        "Int4",
         "Text"
       ]
     },
@@ -227,6 +231,7 @@
       false,
       false,
       false,
+      true,
       true,
       false,
       false,
@@ -250,5 +255,5 @@
       false
     ]
   },
-  "hash": "a8aea4ec81653d523b5022d8603b510ded80d3e23e7808fb6eb0b91e572285cf"
+  "hash": "c013877975576442cf58bdabf628a025d6cce18115e1d9eab61185bbd1c719b4"
 }

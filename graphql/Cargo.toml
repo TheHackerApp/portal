@@ -10,3 +10,4 @@ context = { workspace = true, features = ["graphql"] }
 database = { workspace = true, features = ["graphql"] }
 logging = { workspace = true, features = ["graphql"] }
 tracing.workspace = true
+uuid.workspace = true

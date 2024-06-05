@@ -22,6 +22,7 @@ mod stubs;
 
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity, Referrer};
 pub use draft_application::DraftApplication;
+pub use school::School;
 pub use sqlx::{Error as SqlxError, PgPool};
 
 pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;

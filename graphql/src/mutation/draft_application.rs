@@ -3,8 +3,11 @@ use crate::errors::Forbidden;
 use async_graphql::{Context, InputObject, MaybeUndefined, Object, Result, ResultExt};
 use chrono::NaiveDate;
 use context::{checks, UserRole};
-use database::{Application, DraftApplication, Education, Gender, PgPool, RaceEthnicity, Referrer};
+use database::{
+    Application, DraftApplication, Education, Gender, PgPool, RaceEthnicity, Referrer, School,
+};
 use tracing::instrument;
+use uuid::Uuid;
 
 results! {
     SaveApplicationResult {
@@ -59,6 +62,18 @@ impl Mutation {
             .extend()?
             .unwrap_or_else(|| DraftApplication::new(scope.event.clone(), user.id));
 
+        match input.school_id {
+            MaybeUndefined::Value(school_id) => {
+                if School::exists(&school_id, &mut txn).await.extend()? {
+                    draft.school_id = Some(school_id);
+                } else {
+                    return Ok(UserError::new(&["input", "schoolId"], "unknown school").into());
+                }
+            }
+            MaybeUndefined::Null => draft.school_id = None,
+            MaybeUndefined::Undefined => {}
+        }
+
         set_option!(input.gender => draft.gender);
         set_option!(input.race_ethnicity => draft.race_ethnicity);
         set_option!(input.date_of_birth => draft.date_of_birth);
@@ -101,6 +116,8 @@ struct SaveApplicationInput {
     /// How the participant found the event
     pub referrer: MaybeUndefined<Referrer>,
 
+    /// The school the participant attends
+    pub school_id: MaybeUndefined<Uuid>,
     /// The highest level of education the participant has achieved/is working on
     pub education: MaybeUndefined<Education>,
     /// When the participant will graduate/graduated

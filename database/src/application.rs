@@ -7,6 +7,7 @@ use chrono::{DateTime, NaiveDate, Utc};
 use sqlx::{query, query_as, Acquire, QueryBuilder};
 use std::future::Future;
 use tracing::instrument;
+use uuid::Uuid;
 
 /// A person's gender
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
@@ -106,6 +107,9 @@ pub struct Application {
     /// How the participant found the event
     pub referrer: Option<Referrer>,
 
+    /// The school the participant attends
+    #[cfg_attr(feature = "graphql", graphql(skip))]
+    pub school_id: Option<Uuid>,
     /// The highest level of education the participant has achieved/is working on
     pub education: Education,
     /// When the participant will graduate/graduated
@@ -217,7 +221,7 @@ impl_queries! {
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth, referrer as "referrer: Referrer",
-                education as "education: Education", graduation_year, major,
+                school_id, education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,
@@ -245,7 +249,7 @@ impl_queries! {
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth, referrer as "referrer: Referrer",
-                education as "education: Education", graduation_year, major,
+                school_id, education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,
@@ -280,7 +284,7 @@ impl_queries! {
                 share_information,
                 created_at, updated_at,
                 vcs_url, portfolio_url, devpost_url,
-                referrer
+                referrer, school_id
             )
             SELECT * FROM draft_applications
             WHERE participant_id = $1 AND event = $2
@@ -288,7 +292,7 @@ impl_queries! {
                 event, participant_id,
                 gender as "gender: Gender", race_ethnicity as "race_ethnicity: RaceEthnicity",
                 date_of_birth, referrer as "referrer: Referrer",
-                education as "education: Education", graduation_year, major,
+                school_id, education as "education: Education", graduation_year, major,
                 hackathons_attended, vcs_url, portfolio_url, devpost_url,
                 address_line1, address_line2, address_line3, locality, administrative_area,
                 postal_code, country, share_information,

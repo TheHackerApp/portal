@@ -957,6 +957,7 @@ dependencies = [
  "database",
  "logging",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
