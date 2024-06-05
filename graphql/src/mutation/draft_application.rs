@@ -116,7 +116,7 @@ struct SaveApplicationInput {
     /// How the participant found the event
     pub referrer: MaybeUndefined<Referrer>,
 
-    /// The school the participant attends
+    /// The ID of the school that the participant attends
     pub school_id: MaybeUndefined<Uuid>,
     /// The highest level of education the participant has achieved/is working on
     pub education: MaybeUndefined<Education>,

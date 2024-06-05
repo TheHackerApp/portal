@@ -95,6 +95,10 @@ type Application {
 	The applicant's shipping address
 	"""
 	address: Address!
+	"""
+	The school the participant attends
+	"""
+	school: School
 }
 
 """
@@ -357,6 +361,10 @@ input SaveApplicationInput {
 	"""
 	referrer: Referrer
 	"""
+	The ID of the school that the participant attends
+	"""
+	schoolId: UUID
+	"""
 	The highest level of education the participant has achieved/is working on
 	"""
 	education: Education
@@ -429,6 +437,20 @@ type SaveApplicationResult {
 	userErrors: [UserError!]!
 }
 
+"""
+A verified school
+"""
+type School {
+	"""
+	The school's unique ID
+	"""
+	id: String!
+	"""
+	The school's official name
+	"""
+	name: String!
+}
+
 
 type SubmitApplicationResult {
 	"""
@@ -440,6 +462,18 @@ type SubmitApplicationResult {
 	"""
 	userErrors: [UserError!]!
 }
+
+"""
+A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
+Strings within GraphQL. UUIDs are used to assign unique identifiers to
+entities without requiring a central allocating authority.
+
+# References
+
+* [Wikipedia: Universally Unique Identifier](http://en.wikipedia.org/wiki/Universally_unique_identifier)
+* [RFC4122: A Universally Unique IDentifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+"""
+scalar UUID @specifiedBy(url: "http://tools.ietf.org/html/rfc4122")
 
 """
 Stub for a user in the identity service
