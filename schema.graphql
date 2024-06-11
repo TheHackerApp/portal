@@ -294,6 +294,10 @@ type Participant @key(fields: "event { slug } user { id }", resolvable: false) {
 
 type Query {
 	"""
+	Get the URL for the webhook portal
+	"""
+	webhookDashboardUrl: String! @shareable
+	"""
 	Get a submitted application
 	"""
 	application(id: Int): Application

@@ -2,12 +2,38 @@ use crate::errors::Forbidden;
 use async_graphql::{Context, Object, Result, ResultExt};
 use context::{checks, UserRole};
 use database::{Application, DraftApplication, PgPool};
+use svix::api::{AppPortalAccessIn, Svix};
 use tracing::instrument;
+
+/// When the webhook dashboard should expire (1 day in seconds)
+const WEBHOOK_DASHBOARD_EXPIRY: i32 = 60 * 60 * 24;
 
 pub struct Query;
 
 #[Object]
 impl Query {
+    /// Get the URL for the webhook portal
+    #[graphql(shareable)]
+    #[instrument(name = "Query::webhook_dashboard_url", skip_all)]
+    async fn webhook_dashboard_url(&self, ctx: &Context<'_>) -> Result<String> {
+        let event = checks::is_event(ctx)?;
+        let role = checks::has_at_least_role(ctx, UserRole::Organizer)?;
+
+        let options = AppPortalAccessIn {
+            expiry: Some(WEBHOOK_DASHBOARD_EXPIRY),
+            read_only: Some(role == UserRole::Organizer),
+            ..AppPortalAccessIn::default()
+        };
+
+        let svix = ctx.data_unchecked::<Svix>();
+        let dashboard = svix
+            .authentication()
+            .app_portal_access(event.event.clone(), options, None)
+            .await?;
+
+        Ok(dashboard.url)
+    }
+
     /// Get a submitted application
     #[instrument(name = "Query::application", skip(self, ctx))]
     async fn application(&self, ctx: &Context<'_>, id: Option<i32>) -> Result<Option<Application>> {
