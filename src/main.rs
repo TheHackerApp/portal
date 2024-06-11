@@ -2,6 +2,7 @@ use clap::Parser;
 use eyre::{eyre, WrapErr};
 use logging::OpenTelemetryProtocol;
 use std::net::SocketAddr;
+use svix::api::Svix;
 use tokio::{net::TcpListener, signal};
 use tracing::{info, Level};
 
@@ -19,8 +20,9 @@ async fn main() -> eyre::Result<()> {
     logging.init()?;
 
     let db = database::connect(&config.database_url).await?;
+    let svix = Svix::new(config.svix_api_key, None);
 
-    let router = portal::router(db);
+    let router = portal::router(db, svix);
 
     let listener = TcpListener::bind(&config.address)
         .await
@@ -69,6 +71,10 @@ struct Config {
     /// The database to run migrations on
     #[arg(long, env = "DATABASE_URL")]
     database_url: String,
+
+    /// The Svix environment API key
+    #[arg(long, env = "SVIX_API_KEY")]
+    svix_api_key: String,
 
     /// The default level to log at
     #[arg(long, default_value_t = Level::INFO, env = "LOG_LEVEL")]

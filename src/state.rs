@@ -1,4 +1,5 @@
 use database::PgPool;
+use svix::api::Svix;
 
 macro_rules! state {
     ( $( $field:ident : $type:ty ),+ $(,)? ) => {
@@ -24,10 +25,10 @@ state! {
 }
 
 impl AppState {
-    pub(crate) fn new(db: PgPool) -> Self {
+    pub(crate) fn new(db: PgPool, svix: Svix) -> Self {
         Self {
             db: db.clone(),
-            schema: graphql::schema(db),
+            schema: graphql::schema(db, svix),
         }
     }
 }

@@ -2,6 +2,7 @@ use async_graphql::{
     extensions::Analyzer, EmptySubscription, SDLExportOptions, Schema as BaseSchema, SchemaBuilder,
 };
 use database::PgPool;
+use svix::api::Svix;
 
 mod errors;
 mod mutation;
@@ -22,8 +23,8 @@ fn builder() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
 }
 
 /// Build the schema with the necessary data
-pub fn schema(db: PgPool) -> Schema {
-    builder().data(db).finish()
+pub fn schema(db: PgPool, svix: Svix) -> Schema {
+    builder().data(db).data(svix).finish()
 }
 
 /// Export the GraphQL schema
