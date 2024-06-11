@@ -7,6 +7,7 @@ use svix::api::Svix;
 mod errors;
 mod mutation;
 mod query;
+mod webhooks;
 
 use mutation::Mutation;
 use query::Query;

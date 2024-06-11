@@ -482,6 +482,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-targets 0.52.5",
 ]
@@ -702,6 +703,7 @@ dependencies = [
  "chrono",
  "context",
  "eyre",
+ "serde",
  "sqlx",
  "tokio",
  "tracing",
@@ -982,7 +984,10 @@ dependencies = [
  "context",
  "database",
  "logging",
+ "serde",
+ "serde_json",
  "svix",
+ "tokio",
  "tracing",
  "uuid",
 ]

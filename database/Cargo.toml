@@ -8,6 +8,7 @@ async-graphql = { workspace = true, features = ["dataloader"], optional = true }
 chrono.workspace = true
 context = { workspace = true, features = ["graphql"], optional = true }
 eyre.workspace = true
+serde = { workspace = true, optional = true }
 sqlx = { workspace = true, features = ["chrono", "macros", "uuid"] }
 tracing.workspace = true
 tokio = { workspace = true, optional = true }
@@ -15,4 +16,4 @@ uuid.workspace = true
 
 [features]
 default = []
-graphql = ["async-graphql", "context", "tokio"]
+graphql = ["async-graphql", "chrono/serde", "context", "serde", "tokio"]

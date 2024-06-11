@@ -9,6 +9,8 @@ use context::{
     checks::{guard_where, has_at_least_role},
     UserRole,
 };
+#[cfg(feature = "graphql")]
+use serde::Serialize;
 use sqlx::{query, query_as, Acquire, PgPool, QueryBuilder};
 use std::future::Future;
 use tracing::instrument;
@@ -18,6 +20,8 @@ use uuid::Uuid;
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "gender")]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
 pub enum Gender {
     Male,
     Female,
@@ -29,6 +33,8 @@ pub enum Gender {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "race_ethnicity")]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
 pub enum RaceEthnicity {
     AsianIndian,
     Black,
@@ -53,6 +59,8 @@ pub enum RaceEthnicity {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "education")]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
 pub enum Education {
     BelowSecondary,
     Secondary,
@@ -69,6 +77,8 @@ pub enum Education {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "referrer")]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
 pub enum Referrer {
     Search,
     Peer,
@@ -84,6 +94,8 @@ pub enum Referrer {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, sqlx::Type)]
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "lowercase", type_name = "application_status")]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
 pub enum ApplicationStatus {
     Pending,
     Waitlisted,
@@ -95,6 +107,8 @@ pub enum ApplicationStatus {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "graphql", derive(SimpleObject))]
 #[cfg_attr(feature = "graphql", graphql(complex))]
+#[cfg_attr(feature = "graphql", derive(Serialize))]
+#[cfg_attr(feature = "graphql", serde(rename_all = "camelCase"))]
 pub struct Application {
     /// The slug of the event the application is for
     #[cfg_attr(feature = "graphql", graphql(skip))]
