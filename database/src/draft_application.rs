@@ -1,10 +1,13 @@
 #[cfg(feature = "graphql")]
-use crate::stubs::{Event, Participant};
-use crate::{Education, Gender, RaceEthnicity, Referrer, Result, School};
+use crate::{
+    stubs::{Event, Participant},
+    School,
+};
+use crate::{Education, Gender, RaceEthnicity, Referrer, Result};
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, Context, ResultExt, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
-use sqlx::{query, query_as, Acquire, PgPool};
+use sqlx::{query, query_as, Acquire};
 use std::{fmt::Debug, future::Future};
 use tracing::instrument;
 use uuid::Uuid;
@@ -73,6 +76,7 @@ pub struct DraftApplication {
     pub updated_at: DateTime<Utc>,
 }
 
+#[cfg(feature = "graphql")]
 #[ComplexObject]
 impl DraftApplication {
     /// The event the application is for
@@ -90,7 +94,7 @@ impl DraftApplication {
     async fn school(&self, ctx: &Context<'_>) -> async_graphql::Result<Option<School>> {
         match &self.school_id {
             Some(school_id) => {
-                let db = ctx.data_unchecked::<PgPool>();
+                let db = ctx.data_unchecked::<sqlx::PgPool>();
                 School::find(school_id, db).await.extend()
             }
             None => Ok(None),

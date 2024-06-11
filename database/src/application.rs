@@ -1,6 +1,9 @@
+use crate::Result;
 #[cfg(feature = "graphql")]
-use crate::stubs::{Event, Participant};
-use crate::{Result, School};
+use crate::{
+    stubs::{Event, Participant},
+    School,
+};
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, Context, Enum, ResultExt, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
@@ -11,7 +14,7 @@ use context::{
 };
 #[cfg(feature = "graphql")]
 use serde::Serialize;
-use sqlx::{query, query_as, Acquire, PgPool, QueryBuilder};
+use sqlx::{query, query_as, Acquire, QueryBuilder};
 use std::future::Future;
 use tracing::instrument;
 use uuid::Uuid;
@@ -222,7 +225,7 @@ impl Application {
     async fn school(&self, ctx: &Context<'_>) -> async_graphql::Result<Option<School>> {
         match &self.school_id {
             Some(school_id) => {
-                let db = ctx.data_unchecked::<PgPool>();
+                let db = ctx.data_unchecked::<sqlx::PgPool>();
                 School::find(&school_id, db).await.extend()
             }
             None => Ok(None),
