@@ -4,6 +4,11 @@ use crate::{Result, School};
 #[cfg(feature = "graphql")]
 use async_graphql::{ComplexObject, Context, Enum, ResultExt, SimpleObject};
 use chrono::{DateTime, NaiveDate, Utc};
+#[cfg(feature = "graphql")]
+use context::{
+    checks::{guard_where, has_at_least_role},
+    UserRole,
+};
 use sqlx::{query, query_as, Acquire, PgPool, QueryBuilder};
 use std::future::Future;
 use tracing::instrument;
@@ -151,12 +156,19 @@ pub struct Application {
     /// Whether the participant wishes to share information with sponsors
     pub share_information: bool,
 
-    // TODO: restrict these fields to organizers
     /// The application's acceptance status
     pub status: ApplicationStatus,
     /// Whether the application needs extra review
+    #[cfg_attr(
+        feature = "graphql",
+        graphql(guard = "guard_where(has_at_least_role, UserRole::Organizer)")
+    )]
     pub flagged: bool,
     /// Additional organizer-only notes
+    #[cfg_attr(
+        feature = "graphql",
+        graphql(guard = "guard_where(has_at_least_role, UserRole::Organizer)")
+    )]
     pub notes: String,
 
     /// When the application was submitted
