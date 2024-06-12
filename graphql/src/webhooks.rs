@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use std::sync::Arc;
 use svix::api::{MessageIn, Svix};
-use tracing::{error, instrument};
+use tracing::{error, info_span, instrument, Instrument};
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -37,15 +37,18 @@ where
     .expect("must serialize");
 
     let client = client.clone();
-    let event_slug = event_slug.to_owned();
-    let event_type = event_type.to_owned();
-    tokio::task::spawn(async move {
-        let result = client
-            .message()
-            .create(event_slug, MessageIn::new(event_type, body), None)
-            .await;
-        if let Err(error) = result {
-            error!(%error, "failed to send webhook");
+    let task_event_slug = event_slug.to_owned();
+    let task_event_type = event_type.to_owned();
+    tokio::task::spawn(
+        async move {
+            let result = client
+                .message()
+                .create(task_event_slug, MessageIn::new(task_event_type, body), None)
+                .await;
+            if let Err(error) = result {
+                error!(%error, "failed to send webhook");
+            }
         }
-    });
+        .instrument(info_span!("webhook::send::task", kind = %event_type, slug = %event_slug)),
+    );
 }
