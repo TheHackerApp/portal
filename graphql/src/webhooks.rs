@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
 use serde::Serialize;
+use std::sync::Arc;
 use svix::api::{MessageIn, Svix};
 use tracing::{error, instrument};
 
@@ -23,7 +24,7 @@ pub struct Payload<'p, T> {
 
 /// Send a webhook event
 #[instrument(name = "webhook::send", skip(client, object))]
-pub async fn send<T>(client: &Svix, event_type: &str, event_slug: &str, object: &T)
+pub async fn send<T>(client: &Arc<Svix>, event_type: &str, event_slug: &str, object: &T)
 where
     T: Serialize,
 {
@@ -35,16 +36,16 @@ where
     })
     .expect("must serialize");
 
-    // TODO: spawn as a background task
-    let result = client
-        .message()
-        .create(
-            event_slug.to_owned(),
-            MessageIn::new(event_type.to_owned(), body),
-            None,
-        )
-        .await;
-    if let Err(error) = result {
-        error!(%error, "failed to send webhook");
-    }
+    let client = client.clone();
+    let event_slug = event_slug.to_owned();
+    let event_type = event_type.to_owned();
+    tokio::task::spawn(async move {
+        let result = client
+            .message()
+            .create(event_slug, MessageIn::new(event_type, body), None)
+            .await;
+        if let Err(error) = result {
+            error!(%error, "failed to send webhook");
+        }
+    });
 }

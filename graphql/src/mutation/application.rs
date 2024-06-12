@@ -3,6 +3,7 @@ use crate::{errors::Forbidden, webhooks};
 use async_graphql::{Context, ErrorExtensions, Object, Result, ResultExt};
 use context::{checks, UserRole};
 use database::{Application, DraftApplication, PgPool};
+use std::sync::Arc;
 use svix::api::Svix;
 use tracing::instrument;
 
@@ -72,7 +73,7 @@ impl Mutation {
 
         txn.commit().await?;
 
-        let svix = ctx.data_unchecked::<Svix>();
+        let svix = ctx.data_unchecked::<Arc<Svix>>();
         webhooks::send(svix, "application.submitted", &scope.event, &application).await;
 
         Ok(application.into())
