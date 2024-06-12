@@ -107,3 +107,17 @@ jobs:
             --url http://tha-portal.flycast/graphql
         env:
           HIVE_TOKEN: ${{ secrets.HIVE_TOKEN }}
+
+  webhooks:
+    name: Upload Webhook Types
+    runs-on: ubuntu-22.04
+    needs:
+      - launch
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: svix/svix-event-type-import-action@v1.0.0
+        with:
+          openapi-file: ./webhooks.json
+          svix-api-key: ${{ secrets.SVIX_AUTH_TOKEN }}
+
