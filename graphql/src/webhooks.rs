@@ -1,20 +1,24 @@
 use chrono::{DateTime, Utc};
+#[cfg(feature = "schema")]
+use schemars::JsonSchema;
 use serde::Serialize;
 use svix::api::{MessageIn, Svix};
 use tracing::{error, instrument};
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-struct Payload<'p, T> {
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+pub struct Payload<'p, T> {
     /// The type of webhook
     #[serde(rename = "type")]
-    type_: &'p str,
+    pub type_: &'p str,
     /// The event the webhook applies to
-    for_: &'p str,
+    #[serde(rename = "for")]
+    pub for_: &'p str,
     /// The object the webhook applies to
-    object: &'p T,
+    pub object: &'p T,
     /// When the webhook was sent
-    at: DateTime<Utc>,
+    pub at: DateTime<Utc>,
 }
 
 /// Send a webhook event

@@ -9,9 +9,14 @@ chrono.workspace = true
 context = { workspace = true, features = ["graphql"] }
 database = { workspace = true, features = ["graphql"] }
 logging = { workspace = true, features = ["graphql"] }
+schemars = { workspace = true, optional = true }
 serde.workspace = true
-serde_json = "1"
+serde_json.workspace = true
 svix.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 uuid.workspace = true
+
+[features]
+default = []
+schema = ["schemars"]

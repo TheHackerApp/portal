@@ -1,0 +1,280 @@
+{
+  "$schema": "https://spec.openapis.org/oas/3.1/schema/latest#/definitions/Schema",
+  "webhooks": {
+    "application.submitted": {
+      "post": {
+        "description": "Published when a participant submits an application to your event.",
+        "operationId": "application.submitted",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "at": "2024-06-12T05:30:36.907982118Z",
+                "for": "wafflehacks-2024",
+                "object": {
+                  "addressLine1": "999 Canada Place",
+                  "addressLine2": null,
+                  "addressLine3": null,
+                  "administrativeArea": "British Columbia",
+                  "country": "Canada",
+                  "createdAt": "2024-06-05T05:30:36.907978010Z",
+                  "dateOfBirth": "2000-10-15",
+                  "devpostUrl": null,
+                  "education": "UNDERGRADUATE_THREE_YEAR_PLUS",
+                  "event": "wafflehacks-2024",
+                  "flagged": false,
+                  "gender": "NON_BINARY",
+                  "graduationYear": 2026,
+                  "hackathonsAttended": 2,
+                  "locality": "Vancouver",
+                  "major": "Computer Science",
+                  "notes": "",
+                  "participantId": 3,
+                  "portfolioUrl": null,
+                  "postalCode": "V6C 3T4",
+                  "raceEthnicity": "OTHER",
+                  "referrer": null,
+                  "schoolId": "d9177d19-9ec3-4faa-826c-016d91cf68ce",
+                  "shareInformation": true,
+                  "status": "PENDING",
+                  "updatedAt": "2024-06-12T05:30:36.907981768Z",
+                  "vcsUrl": "https://github.com/akrantz01"
+                },
+                "type": "application.submitted"
+              },
+              "schema": {
+                "properties": {
+                  "at": {
+                    "description": "When the webhook was sent",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "for": {
+                    "description": "The event the webhook applies to",
+                    "type": "string"
+                  },
+                  "object": {
+                    "description": "The object the webhook applies to",
+                    "properties": {
+                      "addressLine1": {
+                        "description": "The first line of the shipping address",
+                        "type": "string"
+                      },
+                      "addressLine2": {
+                        "description": "The second line of the shipping address",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "addressLine3": {
+                        "description": "The last line of the shipping address",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "administrativeArea": {
+                        "description": "The state/province/region of the shipping address",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "country": {
+                        "description": "The ISO code of the country the shipping address is located in",
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "description": "When the application was submitted",
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "dateOfBirth": {
+                        "description": "Participant birthday",
+                        "format": "date",
+                        "type": "string"
+                      },
+                      "devpostUrl": {
+                        "description": "The URL to the participant's DevPost profile",
+                        "format": "uri",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "education": {
+                        "description": "The highest level of education the participant has achieved/is working on",
+                        "enum": [
+                          "BELOW_SECONDARY",
+                          "SECONDARY",
+                          "UNDERGRADUATE_TWO_YEAR",
+                          "UNDERGRADUATE_THREE_YEAR_PLUS",
+                          "GRADUATE",
+                          "BOOTCAMP",
+                          "VOCATIONAL",
+                          "OTHER",
+                          "NON_STUDENT"
+                        ],
+                        "type": "string"
+                      },
+                      "event": {
+                        "description": "The slug of the event the application is for",
+                        "type": "string"
+                      },
+                      "flagged": {
+                        "description": "Whether the application needs extra review",
+                        "type": "boolean"
+                      },
+                      "gender": {
+                        "description": "The participant's gender",
+                        "enum": [
+                          "MALE",
+                          "FEMALE",
+                          "NON_BINARY",
+                          "OTHER"
+                        ],
+                        "type": "string"
+                      },
+                      "graduationYear": {
+                        "description": "When the participant will graduate/graduated",
+                        "format": "int32",
+                        "type": "integer"
+                      },
+                      "hackathonsAttended": {
+                        "description": "How many hackathons the participant has attended",
+                        "format": "int32",
+                        "type": "integer"
+                      },
+                      "locality": {
+                        "description": "The city/town of the shipping address",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "major": {
+                        "description": "What the participant is studying",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "notes": {
+                        "description": "Additional organizer-only notes",
+                        "type": "string"
+                      },
+                      "participantId": {
+                        "description": "The ID of the participant that submitted the application",
+                        "format": "int32",
+                        "type": "integer"
+                      },
+                      "portfolioUrl": {
+                        "description": "The URL to the participant's portfolio",
+                        "format": "uri",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "postalCode": {
+                        "description": "The postal code of the shipping address",
+                        "type": "string"
+                      },
+                      "raceEthnicity": {
+                        "description": "The participant's race/ethnicity",
+                        "enum": [
+                          "ASIAN_INDIAN",
+                          "BLACK",
+                          "CHINESE",
+                          "FILIPINO",
+                          "GUAMANIAN",
+                          "HISPANIC",
+                          "JAPANESE",
+                          "KOREAN",
+                          "MIDDLE_EASTERN",
+                          "NATIVE_AMERICAN",
+                          "NATIVE_HAWAIIAN",
+                          "SAMOAN",
+                          "VIETNAMESE",
+                          "WHITE",
+                          "OTHER_ASIAN",
+                          "OTHER_PACIFIC_ISLANDER",
+                          "OTHER"
+                        ],
+                        "type": "string"
+                      },
+                      "referrer": {
+                        "description": "How the participant found the event",
+                        "enum": [
+                          "SEARCH",
+                          "PEER",
+                          "SOCIAL_MEDIA",
+                          "BLOG",
+                          "ADVERTISEMENT",
+                          "STUDENT_ORGANIZATION",
+                          "SCHOOL",
+                          "OTHER"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "schoolId": {
+                        "description": "The school the participant attends",
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "shareInformation": {
+                        "description": "Whether the participant wishes to share information with sponsors",
+                        "type": "boolean"
+                      },
+                      "status": {
+                        "description": "The application's acceptance status",
+                        "enum": [
+                          "PENDING",
+                          "WAITLISTED",
+                          "REJECTED",
+                          "ACCEPTED"
+                        ],
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "description": "When the application was last modified",
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "vcsUrl": {
+                        "description": "The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)",
+                        "format": "uri",
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "addressLine1",
+                      "country",
+                      "createdAt",
+                      "dateOfBirth",
+                      "education",
+                      "event",
+                      "flagged",
+                      "gender",
+                      "graduationYear",
+                      "hackathonsAttended",
+                      "notes",
+                      "participantId",
+                      "postalCode",
+                      "raceEthnicity",
+                      "shareInformation",
+                      "status",
+                      "updatedAt"
+                    ],
+                    "type": "object"
+                  },
+                  "type": {
+                    "description": "The type of webhook",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "at",
+                  "for",
+                  "object",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

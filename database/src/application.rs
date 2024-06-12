@@ -12,6 +12,8 @@ use context::{
     checks::{guard_where, has_at_least_role},
     UserRole,
 };
+#[cfg(feature = "schema")]
+use schemars::JsonSchema;
 #[cfg(feature = "graphql")]
 use serde::Serialize;
 use sqlx::{query, query_as, Acquire, QueryBuilder};
@@ -24,7 +26,8 @@ use uuid::Uuid;
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "gender")]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 pub enum Gender {
     Male,
     Female,
@@ -37,7 +40,8 @@ pub enum Gender {
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "race_ethnicity")]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 pub enum RaceEthnicity {
     AsianIndian,
     Black,
@@ -63,7 +67,8 @@ pub enum RaceEthnicity {
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "education")]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 pub enum Education {
     BelowSecondary,
     Secondary,
@@ -81,7 +86,8 @@ pub enum Education {
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "kebab-case", type_name = "referrer")]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 pub enum Referrer {
     Search,
     Peer,
@@ -98,7 +104,8 @@ pub enum Referrer {
 #[cfg_attr(feature = "graphql", derive(Enum))]
 #[sqlx(rename_all = "lowercase", type_name = "application_status")]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 pub enum ApplicationStatus {
     Pending,
     Waitlisted,
@@ -111,7 +118,8 @@ pub enum ApplicationStatus {
 #[cfg_attr(feature = "graphql", derive(SimpleObject))]
 #[cfg_attr(feature = "graphql", graphql(complex))]
 #[cfg_attr(feature = "graphql", derive(Serialize))]
-#[cfg_attr(feature = "graphql", serde(rename_all = "camelCase"))]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct Application {
     /// The slug of the event the application is for
     #[cfg_attr(feature = "graphql", graphql(skip))]
@@ -142,10 +150,13 @@ pub struct Application {
     /// How many hackathons the participant has attended
     pub hackathons_attended: i32,
     /// The public VCS URL (i.e. GitHub, GitLab, BitBucket, etc.)
+    #[cfg_attr(feature = "schema", schemars(url))]
     pub vcs_url: Option<String>,
     /// The URL to the participant's portfolio
+    #[cfg_attr(feature = "schema", schemars(url))]
     pub portfolio_url: Option<String>,
     /// The URL to the participant's DevPost profile
+    #[cfg_attr(feature = "schema", schemars(url))]
     pub devpost_url: Option<String>,
 
     /// The first line of the shipping address

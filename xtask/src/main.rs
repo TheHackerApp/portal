@@ -4,6 +4,7 @@ use tracing::{debug, Level};
 
 mod export_schema;
 mod migrate;
+mod webhooks;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -18,6 +19,7 @@ async fn main() -> eyre::Result<()> {
     match args.command {
         Command::ExportSchema(args) => export_schema::run(args),
         Command::Migrate(args) => migrate::run(args).await,
+        Command::Webhooks(args) => webhooks::run(args),
     }
 }
 
@@ -39,6 +41,8 @@ pub enum Command {
     ExportSchema(export_schema::Args),
     /// Manage database migrations
     Migrate(migrate::Args),
+    /// Export the webhook OpenAPI schema to a file
+    Webhooks(webhooks::Args),
 }
 
 /// Load environment variables from a .env file, if it exists.

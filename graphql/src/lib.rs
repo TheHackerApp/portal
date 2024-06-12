@@ -11,6 +11,8 @@ mod webhooks;
 
 use mutation::Mutation;
 use query::Query;
+#[cfg(feature = "schema")]
+pub use webhooks::Payload;
 
 /// The graphql schema for the service
 pub type Schema = BaseSchema<Query, Mutation, EmptySubscription>;
