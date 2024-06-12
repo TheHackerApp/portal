@@ -9,7 +9,7 @@
           "content": {
             "application/json": {
               "example": {
-                "at": "2024-06-12T05:30:36.907982118Z",
+                "at": "2024-05-23T02:37:43Z",
                 "for": "wafflehacks-2024",
                 "object": {
                   "addressLine1": "999 Canada Place",
@@ -17,7 +17,7 @@
                   "addressLine3": null,
                   "administrativeArea": "British Columbia",
                   "country": "Canada",
-                  "createdAt": "2024-06-05T05:30:36.907978010Z",
+                  "createdAt": "2024-05-16T02:37:43Z",
                   "dateOfBirth": "2000-10-15",
                   "devpostUrl": null,
                   "education": "UNDERGRADUATE_THREE_YEAR_PLUS",
@@ -34,10 +34,10 @@
                   "postalCode": "V6C 3T4",
                   "raceEthnicity": "OTHER",
                   "referrer": null,
-                  "schoolId": "d9177d19-9ec3-4faa-826c-016d91cf68ce",
+                  "schoolId": "592dc687-6c47-40b1-9416-4e23d8228d5c",
                   "shareInformation": true,
                   "status": "PENDING",
-                  "updatedAt": "2024-06-12T05:30:36.907981768Z",
+                  "updatedAt": "2024-05-23T02:37:43Z",
                   "vcsUrl": "https://github.com/akrantz01"
                 },
                 "type": "application.submitted"

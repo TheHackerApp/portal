@@ -1,4 +1,4 @@
-use chrono::Utc;
+use super::examples;
 use graphql::Payload;
 use schemars::{
     gen::SchemaGenerator,
@@ -24,12 +24,7 @@ impl Webhook {
     where
         T: JsonSchema + Serialize,
     {
-        let example = Payload {
-            type_: kind,
-            for_: "wafflehacks-2024",
-            object: example,
-            at: Utc::now(),
-        };
+        let example = examples::payload(kind, example);
 
         Self {
             kind,
