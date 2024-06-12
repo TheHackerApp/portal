@@ -120,4 +120,3 @@ jobs:
         with:
           openapi-file: ./webhooks.json
           svix-api-key: ${{ secrets.SVIX_AUTH_TOKEN }}
-

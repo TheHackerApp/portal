@@ -27,7 +27,7 @@ pub async fn send<T>(client: &Svix, event_type: &str, event_slug: &str, object: 
 where
     T: Serialize,
 {
-    let body = serde_json::to_value(&Payload {
+    let body = serde_json::to_value(Payload {
         type_: event_type,
         for_: event_slug,
         object,

@@ -237,7 +237,7 @@ impl Application {
         match &self.school_id {
             Some(school_id) => {
                 let db = ctx.data_unchecked::<sqlx::PgPool>();
-                School::find(&school_id, db).await.extend()
+                School::find(school_id, db).await.extend()
             }
             None => Ok(None),
         }
