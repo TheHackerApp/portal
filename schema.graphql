@@ -293,6 +293,13 @@ type Mutation {
 	"""
 	submitApplication: SubmitApplicationResult!
 	"""
+	Update an application's information
+	
+	The information that can be updated depends on the requester's role. For organizers and
+	greater, only the flagged and notes fields can be updated.
+	"""
+	updateApplication(input: UpdateApplicationInput!): UpdateApplicationResult!
+	"""
 	Change an application's status
 	
 	The following transitions are allowed:
@@ -517,6 +524,35 @@ entities without requiring a central allocating authority.
 * [RFC4122: A Universally Unique IDentifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
 """
 scalar UUID @specifiedBy(url: "http://tools.ietf.org/html/rfc4122")
+
+"""
+Input fields for updating an application
+"""
+input UpdateApplicationInput {
+	"""
+	The ID of the application/participant
+	"""
+	id: Int!
+	"""
+	Whether the application needs extra review
+	"""
+	flagged: Boolean
+	"""
+	Additional organizer-only notes
+	"""
+	notes: String
+}
+
+type UpdateApplicationResult {
+	"""
+	The updated application
+	"""
+	application: Application
+	"""
+	Errors that may have occurred while processing the action
+	"""
+	userErrors: [UserError!]!
+}
 
 """
 Stub for a user in the identity service

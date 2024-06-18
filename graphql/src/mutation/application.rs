@@ -16,6 +16,10 @@ results! {
         /// The updated application
         application: Application,
     }
+    UpdateApplicationResult {
+        /// The updated application
+        application: Application,
+    }
 }
 
 #[derive(Default)]
@@ -83,6 +87,38 @@ impl Mutation {
         Ok(application.into())
     }
 
+    /// Update an application's information
+    ///
+    /// The information that can be updated depends on the requester's role. For organizers and
+    /// greater, only the flagged and notes fields can be updated.
+    #[instrument(name = "Mutation::update_application", skip(self, ctx))]
+    async fn update_application(
+        &self,
+        ctx: &Context<'_>,
+        input: UpdateApplicationInput,
+    ) -> Result<UpdateApplicationResult> {
+        let scope = checks::is_event(ctx)?;
+        checks::has_at_least_role(ctx, UserRole::Organizer)?;
+
+        let db = ctx.data_unchecked::<PgPool>();
+        let Some(mut application) = Application::find(&scope.event, input.id, &*db)
+            .await
+            .extend()?
+        else {
+            return Ok(UserError::new(&["id"], "application not found").into());
+        };
+
+        application
+            .update()
+            .override_flagged(input.flagged)
+            .override_notes(input.notes)
+            .save(&*db)
+            .await
+            .extend()?;
+
+        Ok(application.into())
+    }
+
     /// Change an application's status
     ///
     /// The following transitions are allowed:
@@ -104,7 +140,7 @@ impl Mutation {
             .await
             .extend()?
         else {
-            return Ok(UserError::new(&["participantId"], "application not found").into());
+            return Ok(UserError::new(&["id"], "application not found").into());
         };
 
         if matches!(
@@ -130,6 +166,18 @@ impl Mutation {
 
         Ok(application.into())
     }
+}
+
+/// Input fields for updating an application
+#[derive(Debug, InputObject)]
+struct UpdateApplicationInput {
+    /// The ID of the application/participant
+    id: i32,
+
+    /// Whether the application needs extra review
+    flagged: Option<bool>,
+    /// Additional organizer-only notes
+    notes: Option<String>,
 }
 
 /// Input fields for changing an application's status
