@@ -262,6 +262,26 @@ impl_queries! {
         Ok(result.exists.unwrap_or_default())
     }
 
+    /// Check if an accepted application exists
+    #[instrument(name = "Application::accepted_exists", skip(conn))]
+    pub async fn accepted_exists(event: &'a str, participant_id: i32; conn) -> Result<bool> {
+        let mut conn = conn.acquire().await?;
+        let result = query!(
+            r#"
+            SELECT exists(
+                SELECT 1 FROM applications
+                WHERE status = 'accepted' AND participant_id = $1 AND event = $2
+            )
+            "#,
+            participant_id,
+            event
+        )
+        .fetch_one(&mut *conn)
+        .await?;
+
+        Ok(result.exists.unwrap_or_default())
+    }
+
     /// Get all the submitted applications for an event
     #[instrument(name = "Application::all", skip(conn))]
     pub async fn all(event: &'a str; conn) -> Result<Vec<Application>> {

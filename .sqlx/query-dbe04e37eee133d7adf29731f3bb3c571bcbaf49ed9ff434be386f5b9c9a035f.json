@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT exists(\n                SELECT 1 FROM applications\n                WHERE status = 'accepted' AND participant_id = $1 AND event = $2\n            )\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "dbe04e37eee133d7adf29731f3bb3c571bcbaf49ed9ff434be386f5b9c9a035f"
+}
