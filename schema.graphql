@@ -113,6 +113,31 @@ enum ApplicationStatus {
 
 
 """
+Input fields for changing an application's status
+"""
+input ChangeApplicationStatusInput {
+	"""
+	The ID of the application/participant
+	"""
+	id: Int!
+	"""
+	The new status for the application
+	"""
+	status: ApplicationStatus!
+}
+
+type ChangeApplicationStatusResult {
+	"""
+	The updated application
+	"""
+	application: Application
+	"""
+	Errors that may have occurred while processing the action
+	"""
+	userErrors: [UserError!]!
+}
+
+"""
 Implement the DateTime<Utc> scalar
 
 The input/output is a string in RFC3339 format.
@@ -267,6 +292,16 @@ type Mutation {
 	Submit a draft application
 	"""
 	submitApplication: SubmitApplicationResult!
+	"""
+	Change an application's status
+	
+	The following transitions are allowed:
+	- PENDING    -> WAITLISTED, ACCEPTED, REJECTED
+	- WAITLISTED -> ACCEPTED, REJECTED
+	- ACCEPTED   -> ()
+	- REJECTED   -> ()
+	"""
+	changeApplicationStatus(input: ChangeApplicationStatusInput!): ChangeApplicationStatusResult!
 	"""
 	Save updates to an in-progress application
 	"""

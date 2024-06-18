@@ -1,8 +1,8 @@
 use super::{results, UserError};
 use crate::{errors::Forbidden, webhooks};
-use async_graphql::{Context, ErrorExtensions, Object, Result, ResultExt};
+use async_graphql::{Context, ErrorExtensions, InputObject, Object, Result, ResultExt};
 use context::{checks, UserRole};
-use database::{Application, DraftApplication, PgPool};
+use database::{Application, ApplicationStatus, DraftApplication, PgPool};
 use std::sync::Arc;
 use svix::api::Svix;
 use tracing::instrument;
@@ -10,6 +10,10 @@ use tracing::instrument;
 results! {
     SubmitApplicationResult {
         /// The submitted application
+        application: Application,
+    }
+    ChangeApplicationStatusResult {
+        /// The updated application
         application: Application,
     }
 }
@@ -78,4 +82,61 @@ impl Mutation {
 
         Ok(application.into())
     }
+
+    /// Change an application's status
+    ///
+    /// The following transitions are allowed:
+    /// - PENDING    -> WAITLISTED, ACCEPTED, REJECTED
+    /// - WAITLISTED -> ACCEPTED, REJECTED
+    /// - ACCEPTED   -> ()
+    /// - REJECTED   -> ()
+    #[instrument(name = "Mutation::change_application_status", skip(self, ctx))]
+    async fn change_application_status(
+        &self,
+        ctx: &Context<'_>,
+        input: ChangeApplicationStatusInput,
+    ) -> Result<ChangeApplicationStatusResult> {
+        let scope = checks::is_event(ctx)?;
+        checks::has_at_least_role(ctx, UserRole::Organizer)?;
+
+        let db = ctx.data_unchecked::<PgPool>();
+        let Some(mut application) = Application::find(&scope.event, input.id, &*db)
+            .await
+            .extend()?
+        else {
+            return Ok(UserError::new(&["participantId"], "application not found").into());
+        };
+
+        if matches!(
+            (application.status, input.status),
+            (_, ApplicationStatus::Pending)
+                | (ApplicationStatus::Waitlisted, ApplicationStatus::Waitlisted)
+                | (ApplicationStatus::Accepted, _)
+                | (ApplicationStatus::Rejected, _)
+        ) {
+            return Ok(
+                UserError::new(&["status"], "invalid status transition for application").into(),
+            );
+        }
+
+        application
+            .update()
+            .status(input.status)
+            .save(&*db)
+            .await
+            .extend()?;
+
+        // TODO: send appropriate email
+
+        Ok(application.into())
+    }
+}
+
+/// Input fields for changing an application's status
+#[derive(Debug, InputObject)]
+struct ChangeApplicationStatusInput {
+    /// The ID of the application/participant
+    id: i32,
+    /// The new status for the application
+    status: ApplicationStatus,
 }
