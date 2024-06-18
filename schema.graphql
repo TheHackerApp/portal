@@ -137,6 +137,17 @@ type ChangeApplicationStatusResult {
 	userErrors: [UserError!]!
 }
 
+type CheckInResult {
+	"""
+	WHen the participant checked in
+	"""
+	at: DateTime
+	"""
+	Errors that may have occurred while processing the action
+	"""
+	userErrors: [UserError!]!
+}
+
 """
 Implement the DateTime<Utc> scalar
 
@@ -309,6 +320,10 @@ type Mutation {
 	- REJECTED   -> ()
 	"""
 	changeApplicationStatus(input: ChangeApplicationStatusInput!): ChangeApplicationStatusResult!
+	"""
+	Check in a participant to the event
+	"""
+	checkIn(id: Int): CheckInResult!
 	"""
 	Save updates to an in-progress application
 	"""
