@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO check_ins (event, participant_id)\n            VALUES ($1, $2)\n            ON CONFLICT DO NOTHING\n            RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "event",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "participant_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0fe817a5b2467424391ddee9e404bd481e0c0c5acdd0a78578fef502bf8243b0"
+}

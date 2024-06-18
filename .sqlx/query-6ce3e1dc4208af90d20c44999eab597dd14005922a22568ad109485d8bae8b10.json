@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM check_ins WHERE participant_id = $1 AND event = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6ce3e1dc4208af90d20c44999eab597dd14005922a22568ad109485d8bae8b10"
+}

@@ -15,12 +15,14 @@ use tracing::{info, instrument, log::LevelFilter};
 #[macro_use]
 mod macros;
 mod application;
+mod check_in;
 mod draft_application;
 mod school;
 #[cfg(feature = "graphql")]
 mod stubs;
 
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity, Referrer};
+pub use check_in::CheckIn;
 pub use draft_application::DraftApplication;
 pub use school::School;
 pub use sqlx::{Error as SqlxError, PgPool};
