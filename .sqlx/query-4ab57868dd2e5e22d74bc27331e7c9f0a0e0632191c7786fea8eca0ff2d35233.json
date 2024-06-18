@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO check_ins (event, participant_id)\n            VALUES ($1, $2)\n            ON CONFLICT DO NOTHING\n            RETURNING *\n            ",
+  "query": "\n            INSERT INTO check_ins (event, participant_id)\n            VALUES ($1, $2)\n            ON CONFLICT (event, participant_id)\n                DO UPDATE SET\n                    event = excluded.event,\n                    participant_id = excluded.participant_id\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -31,5 +31,5 @@
       false
     ]
   },
-  "hash": "0fe817a5b2467424391ddee9e404bd481e0c0c5acdd0a78578fef502bf8243b0"
+  "hash": "4ab57868dd2e5e22d74bc27331e7c9f0a0e0632191c7786fea8eca0ff2d35233"
 }

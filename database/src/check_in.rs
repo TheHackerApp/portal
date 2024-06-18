@@ -41,7 +41,10 @@ impl_queries! {
             r#"
             INSERT INTO check_ins (event, participant_id)
             VALUES ($1, $2)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (event, participant_id)
+                DO UPDATE SET
+                    event = excluded.event,
+                    participant_id = excluded.participant_id
             RETURNING *
             "#,
             event,
