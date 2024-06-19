@@ -20,9 +20,10 @@ async fn main() -> eyre::Result<()> {
     logging.init()?;
 
     let db = database::connect(&config.database_url).await?;
+    let mail = mail::Client::new(config.postmark_server_token);
     let svix = Svix::new(config.svix_api_key, None);
 
-    let router = portal::router(db, svix);
+    let router = portal::router(db, mail, svix);
 
     let listener = TcpListener::bind(&config.address)
         .await
@@ -75,6 +76,10 @@ struct Config {
     /// The Svix environment API key
     #[arg(long, env = "SVIX_API_KEY")]
     svix_api_key: String,
+
+    /// The Postmark server-scoped token
+    #[arg(long, env = "POSTMARK_SERVER_TOKEN")]
+    postmark_server_token: String,
 
     /// The default level to log at
     #[arg(long, default_value_t = Level::INFO, env = "LOG_LEVEL")]

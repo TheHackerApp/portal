@@ -25,10 +25,10 @@ state! {
 }
 
 impl AppState {
-    pub(crate) fn new(db: PgPool, svix: Svix) -> Self {
+    pub(crate) fn new(db: PgPool, mail: mail::Client, svix: Svix) -> Self {
         Self {
             db: db.clone(),
-            schema: graphql::schema(db, svix),
+            schema: graphql::schema(db, mail, svix),
         }
     }
 }

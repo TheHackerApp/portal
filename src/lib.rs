@@ -8,13 +8,13 @@ mod state;
 use state::AppState;
 
 /// Setup the routes
-pub fn router(db: PgPool, svix: Svix) -> Router {
+pub fn router(db: PgPool, mail: mail::Client, svix: Svix) -> Router {
     let router = Router::new()
         .route(
             "/graphql",
             get(handlers::playground).post(handlers::graphql),
         )
-        .with_state(AppState::new(db, svix))
+        .with_state(AppState::new(db, mail, svix))
         .layer(logging::http());
 
     Router::new()

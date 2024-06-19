@@ -113,6 +113,18 @@ pub enum ApplicationStatus {
     Accepted,
 }
 
+impl ApplicationStatus {
+    /// Convert the application to a string
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            Self::Pending => "pending",
+            Self::Waitlisted => "waitlisted",
+            Self::Rejected => "rejected",
+            Self::Accepted => "accepted",
+        }
+    }
+}
+
 /// An application to an event
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "graphql", derive(SimpleObject))]

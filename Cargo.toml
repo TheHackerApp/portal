@@ -15,6 +15,7 @@ dotenvy.workspace = true
 eyre.workspace = true
 graphql.workspace = true
 logging = { workspace = true, features = ["http", "opentelemetry"] }
+mail.workspace = true
 svix.workspace = true
 tokio = { workspace = true, features = ["macros", "net", "signal"] }
 tracing.workspace = true
@@ -23,7 +24,7 @@ tracing.workspace = true
 panic = "abort"
 
 [workspace]
-members = ["database", "graphql", "xtask"]
+members = ["database", "graphql", "mail", "xtask"]
 
 [workspace.dependencies]
 async-graphql = { version = "7.0", features = ["chrono", "uuid"], default-features = false }
@@ -45,3 +46,4 @@ uuid = "1.8"
 
 database = { path = "./database" }
 graphql = { path = "./graphql" }
+mail = { path = "./mail" }

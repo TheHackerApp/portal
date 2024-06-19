@@ -9,6 +9,7 @@ chrono.workspace = true
 context = { workspace = true, features = ["graphql"] }
 database = { workspace = true, features = ["graphql"] }
 logging = { workspace = true, features = ["graphql"] }
+mail.workspace = true
 schemars = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true

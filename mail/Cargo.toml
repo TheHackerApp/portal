@@ -1,0 +1,9 @@
+[package]
+name = "mail"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["charset", "http2", "json", "rustls-tls"] }
+serde.workspace = true
+tracing.workspace = true
