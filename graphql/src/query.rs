@@ -64,16 +64,8 @@ impl Query {
     /// Get all submitted applications
     #[instrument(name = "Query::applications", skip_all)]
     async fn applications(&self, ctx: &Context<'_>) -> Result<Vec<Application>> {
-        let user = checks::is_authenticated(ctx)?;
         let scope = checks::is_event(ctx)?;
-
-        let is_organizer = match user.role {
-            Some(role) => role != UserRole::Participant,
-            None => false,
-        };
-        if !is_organizer {
-            return Err(Forbidden.into());
-        }
+        checks::has_at_least_role(ctx, UserRole::Organizer)?;
 
         let db = ctx.data_unchecked::<PgPool>();
         let applications = Application::all(&scope.event, db).await.extend()?;
