@@ -20,7 +20,7 @@ impl Mutation {
     /// Check in a participant to the event
     #[instrument(name = "Mutation::check_in", skip_all)]
     async fn check_in(&self, ctx: &Context<'_>, id: Option<i32>) -> Result<CheckInResult> {
-        let scope = checks::is_event(&ctx)?;
+        let scope = checks::is_event(ctx)?;
         let user = checks::is_authenticated(ctx)?;
 
         let id = if let Some(id) = id {

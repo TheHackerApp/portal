@@ -106,7 +106,7 @@ impl Mutation {
         checks::has_at_least_role(ctx, UserRole::Organizer)?;
 
         let db = ctx.data_unchecked::<PgPool>();
-        let Some(mut application) = Application::find(&scope.event, input.id, &*db)
+        let Some(mut application) = Application::find(&scope.event, input.id, db)
             .await
             .extend()?
         else {
@@ -117,7 +117,7 @@ impl Mutation {
             .update()
             .override_flagged(input.flagged)
             .override_notes(input.notes)
-            .save(&*db)
+            .save(db)
             .await
             .extend()?;
 
@@ -142,7 +142,7 @@ impl Mutation {
         checks::has_at_least_role(ctx, UserRole::Organizer)?;
 
         let db = ctx.data_unchecked::<PgPool>();
-        let Some(mut application) = Application::find(&scope.event, input.id, &*db)
+        let Some(mut application) = Application::find(&scope.event, input.id, db)
             .await
             .extend()?
         else {
@@ -164,7 +164,7 @@ impl Mutation {
         application
             .update()
             .status(input.status)
-            .save(&*db)
+            .save(db)
             .await
             .extend()?;
 
