@@ -1,11 +1,11 @@
 use super::{results, UserError};
-use crate::{errors::Forbidden, webhooks};
+use crate::webhooks;
 use async_graphql::{Context, ErrorExtensions, InputObject, Object, Result, ResultExt};
 use context::{checks, UserRole};
 use database::{Application, ApplicationStatus, DraftApplication, PgPool};
 use std::sync::Arc;
 use svix::api::Svix;
-use tracing::instrument;
+use tracing::{error, instrument};
 
 results! {
     SubmitApplicationResult {
@@ -32,10 +32,7 @@ impl Mutation {
     async fn submit_application(&self, ctx: &Context<'_>) -> Result<SubmitApplicationResult> {
         let user = checks::is_authenticated(ctx)?;
         let scope = checks::is_event(ctx)?;
-
-        if user.role != Some(UserRole::Participant) {
-            return Err(Forbidden.into());
-        }
+        checks::has_role(ctx, UserRole::Participant)?;
 
         let db = ctx.data_unchecked::<PgPool>();
         let mut txn = db.begin().await?;
@@ -83,6 +80,14 @@ impl Mutation {
 
         let svix = ctx.data_unchecked::<Arc<Svix>>();
         webhooks::send(svix, "application.submitted", &scope.event, &application).await;
+
+        let mail = ctx.data_unchecked::<mail::Client>().clone();
+        let email = user.email.clone();
+        tokio::task::spawn(async move {
+            if let Err(error) = mail.send_templated("pending", &email).await {
+                error!(%error, "failed to send email")
+            }
+        });
 
         Ok(application.into())
     }
@@ -133,6 +138,7 @@ impl Mutation {
         input: ChangeApplicationStatusInput,
     ) -> Result<ChangeApplicationStatusResult> {
         let scope = checks::is_event(ctx)?;
+        let user = checks::is_authenticated(ctx)?;
         checks::has_at_least_role(ctx, UserRole::Organizer)?;
 
         let db = ctx.data_unchecked::<PgPool>();
@@ -162,7 +168,13 @@ impl Mutation {
             .await
             .extend()?;
 
-        // TODO: send appropriate email
+        let mail = ctx.data_unchecked::<mail::Client>().clone();
+        let email = user.email.clone();
+        tokio::task::spawn(async move {
+            if let Err(error) = mail.send_templated(input.status.to_str(), &email).await {
+                error!(%error, "failed to send email")
+            }
+        });
 
         Ok(application.into())
     }
