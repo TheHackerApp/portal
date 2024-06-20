@@ -237,7 +237,7 @@ impl Application {
             line2: self.address_line2.as_deref(),
             line3: self.address_line3.as_deref(),
             locality: self.locality.as_deref(),
-            administrative_area: self.locality.as_deref(),
+            administrative_area: self.administrative_area.as_deref(),
             postal_code: &self.postal_code,
             country: &self.country,
         }
