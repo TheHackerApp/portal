@@ -2,7 +2,7 @@ use super::{results, UserError};
 use crate::webhooks;
 use async_graphql::{Context, ErrorExtensions, InputObject, Object, Result, ResultExt};
 use context::{checks, UserRole};
-use database::{Application, ApplicationStatus, DraftApplication, PgPool};
+use database::{Application, ApplicationStatus, DraftApplication, Email, PgPool};
 use std::sync::Arc;
 use svix::api::Svix;
 use tracing::{error, instrument};
@@ -138,11 +138,12 @@ impl Mutation {
         input: ChangeApplicationStatusInput,
     ) -> Result<ChangeApplicationStatusResult> {
         let scope = checks::is_event(ctx)?;
-        let user = checks::is_authenticated(ctx)?;
         checks::has_at_least_role(ctx, UserRole::Organizer)?;
 
         let db = ctx.data_unchecked::<PgPool>();
-        let Some(mut application) = Application::find(&scope.event, input.id, db)
+        let mut txn = db.begin().await?;
+
+        let Some(mut application) = Application::find(&scope.event, input.id, &mut txn)
             .await
             .extend()?
         else {
@@ -164,17 +165,26 @@ impl Mutation {
         application
             .update()
             .status(input.status)
-            .save(db)
+            .save(&mut txn)
             .await
             .extend()?;
 
+        let email = Email::find(input.id, &mut txn)
+            .await
+            .extend()?
+            .expect("email must exist");
+
         let mail = ctx.data_unchecked::<mail::Client>().clone();
-        let email = user.email.clone();
         tokio::task::spawn(async move {
-            if let Err(error) = mail.send_templated(input.status.to_str(), &email).await {
+            if let Err(error) = mail
+                .send_templated(input.status.to_str(), &email.address)
+                .await
+            {
                 error!(%error, "failed to send email")
             }
         });
+
+        txn.commit().await?;
 
         Ok(application.into())
     }
