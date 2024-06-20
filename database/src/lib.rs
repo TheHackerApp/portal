@@ -17,6 +17,7 @@ mod macros;
 mod application;
 mod check_in;
 mod draft_application;
+mod email;
 mod school;
 #[cfg(feature = "graphql")]
 mod stubs;
@@ -24,6 +25,7 @@ mod stubs;
 pub use application::{Application, ApplicationStatus, Education, Gender, RaceEthnicity, Referrer};
 pub use check_in::CheckIn;
 pub use draft_application::DraftApplication;
+pub use email::Email;
 pub use school::School;
 pub use sqlx::{Error as SqlxError, PgPool};
 
