@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO emails VALUES ($1, $2) RETURNING *",
+  "query": "\n            INSERT INTO emails VALUES ($1, $2)\n            ON CONFLICT (participant_id) DO UPDATE SET address = excluded.address\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -25,5 +25,5 @@
       false
     ]
   },
-  "hash": "9338c5f79cb6b6f8dffd5925a91fd52ac1a275e3e1de7814b3b99515887979ae"
+  "hash": "1ebed314e344a4fe9783b0d2ba106f52ba8ed575e1a33c9e8d4222f400dafe6f"
 }

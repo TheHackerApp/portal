@@ -30,12 +30,16 @@ impl_queries! {
     }
 
     /// Associate an email with a participant
-    #[instrument(name = "Email::create", skip(conn))]
-    pub async fn create(id: i32, address: &'a str; conn) -> Result<Email> {
+    #[instrument(name = "Email::upsert", skip(conn))]
+    pub async fn upsert(id: i32, address: &'a str; conn) -> Result<Email> {
         let mut conn = conn.acquire().await?;
         let email = query_as!(
             Email,
-            "INSERT INTO emails VALUES ($1, $2) RETURNING *",
+            r#"
+            INSERT INTO emails VALUES ($1, $2)
+            ON CONFLICT (participant_id) DO UPDATE SET address = excluded.address
+            RETURNING *
+            "#,
             id,
             address
         )
