@@ -2103,6 +2103,7 @@ dependencies = [
  "graphql",
  "logging",
  "mail",
+ "serde",
  "svix",
  "tokio",
  "tracing",

@@ -14,6 +14,7 @@ pub fn router(db: PgPool, mail: mail::Client, svix: Svix) -> Router {
             "/graphql",
             get(handlers::playground).post(handlers::graphql),
         )
+        .nest("/webhooks", handlers::webhooks())
         .with_state(AppState::new(db, mail, svix))
         .layer(logging::http());
 

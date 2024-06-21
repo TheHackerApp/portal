@@ -16,6 +16,7 @@ eyre.workspace = true
 graphql.workspace = true
 logging = { workspace = true, features = ["http", "opentelemetry"] }
 mail.workspace = true
+serde.workspace = true
 svix.workspace = true
 tokio = { workspace = true, features = ["macros", "net", "signal"] }
 tracing.workspace = true

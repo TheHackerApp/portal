@@ -4,6 +4,10 @@ use axum::{extract::State, http::StatusCode, response::Html};
 use context::{Scope, User};
 use tracing::instrument;
 
+mod webhooks;
+
+pub use webhooks::router as webhooks;
+
 /// Handle graphql requests
 #[instrument(name = "graphql", skip_all)]
 pub(crate) async fn graphql(
